@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#05070c" />
+  <title>EXMOB</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%2305070c'/%3E%3Ctext x='32' y='44' font-family='Arial Black' font-size='34' fill='%23e8dcc0' text-anchor='middle'%3EX%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="./src/ui/styles.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="ui"></div>
+  <div id="boot-message" class="boot-message">
+    <div class="boot-title">EXMOB</div>
+    <div class="boot-sub" id="boot-sub">LOADING</div>
+  </div>
+  <script>
+    // Browsers block ES modules and asset fetches over file://. Explain instead of showing a blank page.
+    if (location.protocol === 'file:') {
+      document.getElementById('boot-sub').innerHTML =
+        'EXMOB must be served over HTTP.<br><br>Run <code>npm install</code> then <code>npm run dev</code><br>and open the printed localhost URL.';
+    }
+  </script>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
