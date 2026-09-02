@@ -34,3 +34,7 @@ First vertical slice: **Chapter 1 - The Cabin**.
 - Debug overlay (FPS, frame time, draw calls, counts, cheats, AI/nav visualization).
 - Blender generator scripts producing the initial GLB asset library.
 - Vitest unit tests and an in-browser smoke test harness.
+- Game loop watchdog for browsers that starve requestAnimationFrame, and a dev-only `?catchup=1`
+  flag for automated testing in throttled tabs.
+- Static geometry batching (walls, frames, props, vehicles, character parts) to keep draw calls
+  within budget.

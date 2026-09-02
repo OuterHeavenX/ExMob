@@ -4,6 +4,7 @@ import { getMaterials } from './Materials.js';
 import { buildProp, PROP_HEIGHTS } from './PropFactory.js';
 import { ColliderSet } from './Colliders.js';
 import { seededRandom } from '../utils/math.js';
+import { batchGroup } from './Batch.js';
 
 /**
  * Builds the Cabin from src/data/properties/cabin.js: floor, walls split around openings,
@@ -390,7 +391,7 @@ export class CabinBuilder {
   _props() {
     for (const p of this.data.props) {
       let g = this.assets.instance(p.asset);
-      if (!g) g = this._batchProp(buildProp(p.asset));
+      g = this._batchProp(g || buildProp(p.asset));
       g.position.set(p.x, this.groundHeight(p.x, p.z), p.z);
       g.rotation.y = p.rot || 0;
       g.name = 'prop:' + p.id;
@@ -408,26 +409,12 @@ export class CabinBuilder {
     }
   }
 
-  /** Merge a procedural prop's meshes per material (keeps named children such as `shade`). */
+  /**
+   * Merge a prop's meshes per material into a few draw calls. Works for procedural groups and
+   * GLB instances. Named functional children (shade, screen, pane, door, headlight*) are kept.
+   */
   _batchProp(group) {
-    const byMat = new Map();
-    const keep = [];
-    for (const child of group.children) {
-      if (!child.isMesh || child.name) { keep.push(child); continue; }
-      child.updateMatrix();
-      const geo = child.geometry.clone().applyMatrix4(child.matrix);
-      const key = child.material.uuid;
-      if (!byMat.has(key)) byMat.set(key, { mat: child.material, geos: [] });
-      byMat.get(key).geos.push(geo);
-    }
-    const out = new THREE.Group();
-    for (const { mat, geos } of byMat.values()) {
-      const m = new THREE.Mesh(mergeGeometries(geos, false), mat);
-      m.castShadow = true; m.receiveShadow = true;
-      out.add(m);
-    }
-    for (const k of keep) out.add(k);
-    return out;
+    return batchGroup(group);
   }
 
   _storyProps() {

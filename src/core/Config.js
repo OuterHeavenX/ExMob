@@ -12,10 +12,15 @@ function readFlag(name) {
   } catch { return false; }
 }
 
+// ?catchup=1 (dev/testing only): let the simulation catch up across long gaps between frames
+// (throttled tabs, embedded automation) instead of slowing down. Never on for players.
+const catchup = readFlag('catchup');
+
 export const CONFIG = Object.freeze({
   fixedDt: 1 / 60,
-  maxSubsteps: 4,
-  maxFrameDt: 0.1,
+  maxSubsteps: catchup ? 90 : 4,
+  maxFrameDt: catchup ? 1.5 : 0.1,
+  catchup,
   devMode: readFlag('dev'),
   smokeTest: readFlag('smoke'),
   experimentalGPU: readFlag('gpu'),

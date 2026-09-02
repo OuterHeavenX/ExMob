@@ -74,7 +74,9 @@ and dispose it on exit.
 
 Fixed timestep simulation (60 Hz, max 4 substeps) with interpolation-free rendering at display
 rate. `dt` is clamped so tab switches do not explode the simulation. Pause stops simulation but
-keeps rendering menus.
+keeps rendering menus. A watchdog timer steps the loop when the browser starves
+`requestAnimationFrame` (some embedded WebViews). `?catchup=1` (dev only) raises the substep
+limit so automated tests in throttled tabs run in real time.
 
 ## Rendering
 

@@ -39,7 +39,8 @@ Tests:
 npm test
 ```
 
-Regenerate the Blender asset library (requires Blender 4.2+ on PATH or `BLENDER_PATH` set):
+Regenerate the Blender prototype asset library (requires Blender 4.2+ on PATH or `BLENDER_PATH`
+set). The committed `assets/models/` already contains the generated GLBs, so this is optional:
 
 ```bash
 npm run blender:build

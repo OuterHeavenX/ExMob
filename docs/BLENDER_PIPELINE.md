@@ -11,8 +11,25 @@ This proves the pipeline end to end (Blender -> GLB -> runtime loader) and produ
 blockout assets. Every generated asset is a **prototype**, not production art. See STATUS.md.
 
 Characters are exported as a hierarchy of named parts (`Head`, `Torso`, `ArmL`, `ArmR`, `LegL`,
-`LegR`, `Hand_R` weapon socket) so the runtime can drive simple procedural animation until real
+`LegR`, `SOCK_Hand_R` weapon socket) so the runtime can drive simple procedural animation until real
 rigs and skeletal animation land.
+
+Generated library (47 assets, ~340 KB of GLB, source `.blend` files under `blender/`):
+
+| Family | Assets |
+| --- | --- |
+| Characters | CHR_ExMob, CHR_Goon01, CHR_Enforcer01, CHR_Soldier01, CHR_Hitman01 |
+| Weapons | WPN_Pistol01, WPN_Revolver01, WPN_Shotgun01, WPN_SMG01 |
+| Architecture | ENV_Cabin_Wall_A, Corner_A, Floor_A, Window_A, Window_A_Broken, Door_A, Door_A_Broken, Roof_A |
+| Furniture | PRP_Couch_A, Table_A, Table_Coffee_A, Chair_A, Chair_Arm_A, Bed_A, Nightstand_A, Counter_A, Fridge_A, Cabinet_A, Shelf_A, TV_A, Lamp_Floor_A, Lamp_Ceiling_A, Toilet_A, Sink_A, Tub_A |
+| Props | PRP_Suitcase_A, Paper_A, Can_A, Phone_A, Photo_A |
+| Vehicles | VEH_Sedan_A |
+| Environment | ENV_Tree_Pine_A, Rock_A, Grass_A, Fence_A |
+| Damage | ENV_Debris_Wood_A, Debris_Glass_A, Door_Fragment_A |
+
+The runtime uses the character, weapon, prop, and vehicle GLBs. The cabin walls, windows, doors,
+roof, trees, rocks, and debris are still assembled procedurally from the same module numbers
+(ADR-012); the architecture and environment GLBs are library assets for the production pass.
 
 ## Library structure
 

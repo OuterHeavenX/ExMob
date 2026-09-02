@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { getMaterials } from '../world/Materials.js';
 import { ColliderSet } from '../world/Colliders.js';
 import { EV } from '../core/Events.js';
+import { batchGroup } from '../world/Batch.js';
 import { angleDamp, damp } from '../utils/math.js';
 
 /**
@@ -25,7 +26,7 @@ export class Vehicle {
     this.size = { x: 2.0, z: 4.6 };
     this.dustT = 0;
     const inst = world.assets.instance(asset);
-    if (inst) { this.group.add(inst); this.mesh = inst; }
+    if (inst) { this.mesh = batchGroup(inst); this.group.add(this.mesh); }
     else this._buildProcedural();
     this._buildLights();
     world.scene.add(this.group);

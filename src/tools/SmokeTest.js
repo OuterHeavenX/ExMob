@@ -37,19 +37,21 @@ export class SmokeTest {
     w.cinematics.abort();
     if (w.waves.phase === 'IDLE') w.waves.start(0);
     await this.wait(0.2);
-    // movement: simulate input
+    // movement: drive the keyboard source (the unified state is rebuilt from it every tick)
     const p = w.player;
+    const kbm = ctx.input.kbm;
+    ctx.input.setMode('desktop');
     const x0 = p.x;
-    ctx.input.move.x = 1;
-    const moveOverride = () => { ctx.input.move.x = 1; };
-    ev.on(EV.WAVE_START, () => {});
-    for (let i = 0; i < 20; i++) { moveOverride(); await this.wait(0.03); }
-    ctx.input.move.x = 0;
+    kbm.keys.add('KeyD');
+    await this.waitFor(() => Math.abs(p.x - x0) > 0.3, 8);
+    kbm.keys.delete('KeyD');
     this.log('player moves', Math.abs(p.x - x0) > 0.3, `dx=${(p.x - x0).toFixed(2)}`);
-    // shooting
+    // shooting: mouse held for a couple of ticks
     const shots0 = w.stats.shotsFired;
-    p.controller.aim.x = 0; p.controller.aim.z = 1;
-    ctx.input.fire = true; await this.wait(0.1); ctx.input.fire = false; await this.wait(0.1);
+    kbm.mouse.x = ctx.renderer.width / 2; kbm.mouse.y = ctx.renderer.height * 0.8;
+    kbm.mouseDown = true;
+    await this.waitFor(() => w.stats.shotsFired > shots0, 5);
+    kbm.mouseDown = false;
     this.log('player shoots', w.stats.shotsFired > shots0);
     // wave 1 begins (warning -> active), enemies spawn
     if (w.waves.phase === 'PREP') w.waves.ready();

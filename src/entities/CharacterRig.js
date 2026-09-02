@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { buildWeaponMesh } from '../world/PropFactory.js';
 import { WEAPONS } from '../data/weapons/weaponRegistry.js';
 import { damp, angleDamp } from '../utils/math.js';
+import { batchPivotChildren } from '../world/Batch.js';
 
 /**
  * Procedurally animated character (ADR-010). Builds a rigid-part humanoid from a `look`
@@ -29,6 +30,7 @@ export class CharacterRig {
     if (gltf) this._fromGLTF(gltf);
     else this._buildProcedural(look, height, width);
     this._buildBlob(height, width);
+    for (const n of ['Head', 'Torso', 'ArmL', 'ArmR', 'LegL', 'LegR']) if (this.parts[n]) batchPivotChildren(this.parts[n]);
     this.setWeapon(weaponId);
   }
 
