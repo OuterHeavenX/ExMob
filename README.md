@@ -80,7 +80,7 @@ Smoke test harness: `?dev=1&smoke=1` runs the automated smoke sequence and print
 index.html            Entry point
 src/                  Game source (ES modules)
 src/data/             Data registries (enemies, weapons, waves, economy, ...)
-assets/               Runtime assets (exported GLB, textures, audio)
+assets/               Runtime assets (exported GLB, textures, audio); served at the site root (assets/models -> /models)
 blender/              Blender source library + generator/export scripts
 docs/                 Design bible and technical documentation
 tests/                Vitest unit tests

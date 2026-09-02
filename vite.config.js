@@ -5,6 +5,9 @@ import { defineConfig } from 'vite';
 // `npm run dev` serves it over HTTP (required: ES modules + GLB assets cannot load over file://).
 export default defineConfig({
   base: './',
+  // Runtime assets (assets/models, assets/audio, ...) are served at the site root in dev and
+  // copied into dist/ on build: assets/models/X.glb -> /models/X.glb.
+  publicDir: 'assets',
   server: { port: Number(process.env.PORT) || 5173, strictPort: false, open: false },
   build: {
     target: 'es2022',

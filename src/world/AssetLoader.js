@@ -2,14 +2,15 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 /**
- * GLB asset loader with a manifest (assets/models/manifest.json). Assets not in the manifest
+ * GLB asset loader with a manifest (assets/models/manifest.json, served at /models/manifest.json
+ * because Vite's publicDir is `assets/`). Assets not in the manifest
  * resolve to null immediately so callers use procedural fallbacks without 404 noise.
  * Loaded scenes are cached; `get()` returns a deep clone.
  */
 const CATEGORY = { CHR: 'characters', WPN: 'weapons', PRP: 'props', VEH: 'vehicles', ENV: 'environment' };
 
 export class AssetLoader {
-  constructor(base = 'assets/models/') {
+  constructor(base = 'models/') {
     this.base = base;
     this.loader = new GLTFLoader();
     this.cache = new Map();

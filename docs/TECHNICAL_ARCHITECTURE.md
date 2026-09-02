@@ -107,5 +107,6 @@ the critical path and prints a pass/fail table to the console and an overlay.
 
 ## Build and deploy
 
-`npm run build` outputs a static `dist/` (index.html + hashed assets + copied `assets/`). Any
-static host works. Relative `base` so it can live under a subpath.
+`npm run build` outputs a static `dist/` (index.html + hashed bundles + the contents of `assets/`
+copied to the root, so `assets/models/X.glb` is served as `/models/X.glb`). Any static host works.
+Relative `base` so it can live under a subpath.
