@@ -53,7 +53,7 @@ export class TouchInput {
     for (const [action, glyph, label] of defs) {
       const b = el('button', { class: `touch-btn touch-btn-${action}`, 'data-action': action, 'aria-label': label },
         [el('span', { class: 'glyph', text: glyph }), el('span', { class: 'lbl', text: label })]);
-      b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); b.setPointerCapture(e.pointerId); b.classList.add('down'); this.m.press(action); });
+      b.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); try { b.setPointerCapture(e.pointerId); } catch { /* synthetic pointer */ } b.classList.add('down'); this.m.press(action); });
       const up = (e) => { b.classList.remove('down'); this.m.release(action); };
       b.addEventListener('pointerup', up);
       b.addEventListener('pointercancel', up);
@@ -69,7 +69,6 @@ export class TouchInput {
   _bind() {
     const r = this.root;
     r.addEventListener('pointerdown', (e) => {
-      if (e.pointerType === 'mouse' && !this.m.mode === 'touch') return;
       if (e.target.closest('.touch-btn')) return;
       if (this.m.mode !== 'touch') this.m.setMode('touch');
       const left = e.clientX < window.innerWidth / 2;
@@ -84,7 +83,7 @@ export class TouchInput {
       stick.base.style.top = `${e.clientY}px`;
       stick.knob.style.transform = 'translate(-50%,-50%)';
       this._pointers.set(e.pointerId, stick);
-      r.setPointerCapture?.(e.pointerId);
+      try { r.setPointerCapture(e.pointerId); } catch { /* synthetic pointer */ }
       e.preventDefault();
     });
     r.addEventListener('pointermove', (e) => {
