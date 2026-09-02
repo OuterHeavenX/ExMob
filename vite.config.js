@@ -12,7 +12,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
-        manualChunks: { three: ['three'] },
+        manualChunks: (id) => (id.includes('node_modules/three') ? 'three' : undefined),
       },
     },
   },
