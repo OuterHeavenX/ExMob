@@ -1,0 +1,26 @@
+{
+  "name": "exmob",
+  "version": "0.1.0",
+  "description": "EXMOB - a stylish browser-based 3D action-survival game. Chapter 1: The Cabin.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "blender:build": "node tools/build-blender-assets.mjs",
+    "validate:data": "node tools/validate-registries.mjs"
+  },
+  "dependencies": {
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
