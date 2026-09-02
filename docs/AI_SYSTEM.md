@@ -21,7 +21,7 @@ The Cabin implements the foundation; later chapters add squad tactics on top of 
 | BREACH | Attack a portal (door/window/boards) until it opens | Yes |
 | ENTER_BUILDING | Move through the portal (door walk / window climb) | Yes |
 | SEARCH | Path to last known position inside | Yes |
-| ENGAGE | Has line of sight: shoot, strafe, keep preferred range | Yes |
+| ENGAGE | Has line of sight: shoot, strafe, keep preferred range (non-aggressive archetypes back off when the player closes inside it) | Yes |
 | RETREAT | Fall back when hurt (professionals) | Yes (hitman) |
 | REPOSITION | Move to a better firing position | Partial (via SEEK_COVER) |
 | SPECIAL_ACTION | Archetype-specific (throw molotov, call reinforcements) | No |

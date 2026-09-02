@@ -59,8 +59,8 @@ export const CABIN = Object.freeze({
 
   /** Portals: doors and windows. `facing` is the outward normal for exterior portals. */
   portals: Object.freeze({
-    door_front: { id: 'door_front', kind: 'door', name: 'FRONT DOOR', x: -1.0, z: 4, axis: 'x', facing: { x: 0, z: 1 }, hp: 120, exterior: true, room: 'living', hinge: -1 },
-    door_back: { id: 'door_back', kind: 'door', name: 'BACK DOOR', x: 0.0, z: -4, axis: 'x', facing: { x: 0, z: -1 }, hp: 100, exterior: true, room: 'hall', hinge: 1 },
+    door_front: { id: 'door_front', kind: 'door', name: 'FRONT DOOR', x: -1.0, z: 4, axis: 'x', facing: { x: 0, z: 1 }, hp: 150, exterior: true, room: 'living', hinge: -1 },
+    door_back: { id: 'door_back', kind: 'door', name: 'BACK DOOR', x: 0.0, z: -4, axis: 'x', facing: { x: 0, z: -1 }, hp: 130, exterior: true, room: 'hall', hinge: 1 },
     door_bedroom: { id: 'door_bedroom', kind: 'door', name: 'BEDROOM DOOR', x: -1, z: -2, axis: 'z', facing: { x: 1, z: 0 }, hp: 80, exterior: false, room: 'bedroom', hinge: -1 },
     win_living_s: { id: 'win_living_s', kind: 'window', name: 'LIVING ROOM WINDOW (S)', x: -3.5, z: 4, axis: 'x', facing: { x: 0, z: 1 }, hp: 1, boardHp: 90, exterior: true, room: 'living' },
     win_living_w: { id: 'win_living_w', kind: 'window', name: 'LIVING ROOM WINDOW (W)', x: -6, z: 2, axis: 'z', facing: { x: -1, z: 0 }, hp: 1, boardHp: 90, exterior: true, room: 'living' },

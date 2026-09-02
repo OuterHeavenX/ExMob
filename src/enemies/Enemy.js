@@ -28,7 +28,7 @@ export class Enemy {
     this.opts = opts;
     this.lastHitBy = null;
     const gltf = world.assets.instance(def.model);
-    this.rig = new CharacterRig({ look: def.look, height: def.height, width: def.look.width, gltf, weaponId: def.weapon, assets: world.assets });
+    this.rig = new CharacterRig({ look: def.look, height: def.height, width: def.look.width, gltf, clips: world.assets.clips(def.model), weaponId: def.weapon, assets: world.assets });
     world.scene.add(this.rig.root);
     this.nav = new EnemyNavigation(this);
     this.combat = new EnemyCombat(this);

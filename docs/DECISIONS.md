@@ -103,7 +103,10 @@ tests.
 ## ADR-007: Synthesized placeholder SFX via Web Audio
 
 **Decision.** v0.1 ships procedurally synthesized SFX (noise bursts, oscillators) through a bus
-graph. No audio files.
+graph. No audio files. **v0.2 update:** SFX are now file-based (`assets/audio/manifest.json`
+maps each registry id to one or more sample files with random variation) with the realtime synth
+as fallback. The shipped files are still synthesized, rendered offline by `tools/bake-sfx.mjs`
+with heavier DSP; recorded SFX replace them per id with no code change.
 
 **Why.** Zero asset licensing risk, zero load time, and it forces the bus architecture to exist
 now. Real recorded SFX slot in later without changing callers.

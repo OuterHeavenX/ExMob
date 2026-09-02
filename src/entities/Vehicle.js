@@ -35,7 +35,8 @@ export class Vehicle {
   _buildProcedural() {
     const M = getMaterials();
     const paint = this.player ? M.carPaintPlayer : M.carPaint;
-    const mk = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; this.group.add(m); return m; };
+    const tmp = new THREE.Group();
+    const mk = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; tmp.add(m); return m; };
     mk(new THREE.BoxGeometry(1.9, 0.55, 4.5), paint, 0, 0.55, 0);              // lower body
     mk(new THREE.BoxGeometry(1.7, 0.5, 2.3), paint, 0, 1.05, -0.2);             // cabin
     mk(new THREE.BoxGeometry(1.62, 0.42, 2.1), M.carGlass, 0, 1.08, -0.2);      // glass
@@ -52,6 +53,8 @@ export class Vehicle {
     if (this.player) { // dent of history: a small rust patch
       mk(new THREE.BoxGeometry(0.4, 0.2, 0.02), M.stone, -0.96, 0.6, 0.4);
     }
+    this.mesh = batchGroup(tmp);
+    this.group.add(this.mesh);
   }
 
   _buildLights() {

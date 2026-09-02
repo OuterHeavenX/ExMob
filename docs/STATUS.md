@@ -1,6 +1,6 @@
 # EXMOB - STATUS
 
-Honest state of every system as of **v0.1.0** (2026-09-02). Rule 17 of AGENTS.md: nothing here is
+Honest state of every system as of **v0.2.0** (2026-09-02). Rule 17 of AGENTS.md: nothing here is
 marked working unless it was exercised. "Tested" means exercised in the dev browser (Chromium,
 Windows 11, RTX 5080) unless stated otherwise.
 
@@ -44,7 +44,14 @@ Windows 11, RTX 5080) unless stated otherwise.
   archetype); AI path and nav grid visualization.
 - **Tests**: 39 Vitest unit tests pass (`npm test`). Registry validation passes.
 - **Blender pipeline**: headless generator scripts export 47 GLB prototypes with a manifest;
-  the runtime loads them (characters with named part pivots, weapons in hand, props, sedan).
+  the runtime loads them (skinned characters with clips, weapons in hand, props, sedan).
+- **Skeletal animation**: all five characters are skinned to a shared skeleton with Idle/Aim/
+  Walk/Run/Fire/Reload/Hit/Death/Kick clips; locomotion blends by speed, one-shots on fire,
+  reload, hit, door kick and death. Verified in-browser (run blend at full speed, death falls
+  away from the shot, kicks on breach).
+- **SFX files**: 32 ids play from baked samples with variation; synth fallback if a file is
+  missing.
+- **Deploy**: GitHub Pages workflow builds, tests and publishes `dist/` on every push to main.
 
 ## PARTIAL
 
@@ -68,10 +75,12 @@ Windows 11, RTX 5080) unless stated otherwise.
 ## PLACEHOLDER
 
 - **All 3D assets**: procedural and Blender-generated blockouts with flat PBR materials. Not
-  production art. Characters are rigid-part rigs with procedural animation (no skeletal
-  animation, no Blender action clips).
+  production art. Character clips are hand-keyed poses, not motion capture; no per-weapon
+  fire/reload variants, no dodge or window-climb clips yet.
 - **Textures**: canvas-generated wood grain and noise; no authored texture sets.
-- **Audio**: every sound is synthesized. No recorded SFX, no composed music, no voice.
+- **Audio**: every sound is still synthesized (now rendered offline to files). No recorded SFX,
+  no composed music, no voice. The baked set is 2.8 MB of WAV; compress to OGG/MP3 before a
+  mobile-focused release.
 - **Intro / compromised cinematics**: captions and camera moves only; the phone message is a
   caption, not a rendered phone UI.
 - **Story dressing**: newspaper clipping, coffee can, burner phone, photograph, mail, map exist
@@ -91,14 +100,13 @@ Windows 11, RTX 5080) unless stated otherwise.
 
 ## KNOWN ISSUES
 
-- **Draw calls exceed the desktop budget under load**: 370 idle, 430-570 in combat with GLB
-  props and enemies (budget 400). Batching is in place; remaining cost is per-enemy parts,
-  decals, debris, and pane/board meshes.
+- Draw calls: ~320 idle, ~343 after wave 1 with four bodies, decals and debris (desktop budget
+  400). Wave 5 with 8 active enemies has not been measured yet.
 - The embedded browser used for automated checks throttles `requestAnimationFrame` and timers
   to ~1 Hz when unfocused; the game loop watchdog and `?catchup=1` compensate for testing only.
   A normal Chromium window measured 240 fps at HIGH (uncapped) on the RTX 5080 dev machine.
-- Enemies that enter a room at close range engage at point-blank instead of backing off; goons
-  do not keep their preferred range when the player is stationary at a doorway.
+- Enemies now back off inside their preferred range, but still bunch up in doorways when
+  several arrive together.
 - Shadow map follows the player with a 60 m orthographic frustum; distant shadows are soft.
 - Grass tufts and trees are single-LOD instanced cones; no LOD switching.
 - The vehicle arrival zoom can coincide with a banner; both are brief.
@@ -107,12 +115,11 @@ Windows 11, RTX 5080) unless stated otherwise.
 
 ## NEXT PRIORITIES
 
-1. Playtest the wave 1-2 "moment" with a real mouse and tune enemy range keeping, door HP,
-   and pistol feel (docs/CABIN_VERTICAL_SLICE.md success criteria).
-2. Physical device pass: iPhone and Android touch controls, performance at LOW/MEDIUM,
-   safe areas.
-3. Reduce draw calls in combat below 400 (merge character parts across enemies with instancing,
-   cap decals per quality tier, batch window boards/panes).
-4. Skeletal rigs and animation clips in Blender for ExMob and the goon, replacing procedural
-   part animation.
-5. Recorded weapon and impact SFX behind the existing audio registry ids.
+1. Human playtest of waves 1-5 on the Pages build (desktop mouse + a phone) and record
+   findings against docs/CABIN_VERTICAL_SLICE.md success criteria.
+2. Measure wave 5 (8 active enemies) frame time and draw calls on desktop and a mid-range
+   phone; enable automatic quality step-down if needed.
+3. Per-weapon fire/reload clips, dodge clip, window-climb clip; mixer throttling for distant
+   enemies.
+4. Compress baked SFX to OGG/MP3 and add recorded weapon layers behind the same ids.
+5. Bloom on HIGH/ULTRA and baked interior lightmaps for the production art pass.

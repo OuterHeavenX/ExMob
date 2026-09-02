@@ -10,9 +10,22 @@ low-poly prototype meshes with correct naming, scale, origins, and materials, th
 This proves the pipeline end to end (Blender -> GLB -> runtime loader) and produces consistent
 blockout assets. Every generated asset is a **prototype**, not production art. See STATUS.md.
 
-Characters are exported as a hierarchy of named parts (`Head`, `Torso`, `ArmL`, `ArmR`, `LegL`,
-`LegR`, `SOCK_Hand_R` weapon socket) so the runtime can drive simple procedural animation until real
-rigs and skeletal animation land.
+Characters are exported as **skinned meshes with a shared skeleton and keyframed clips**
+(v0.2.0). The skeleton has 10 bones with dot-free names so Three.js keeps them verbatim:
+
+```
+root (ground pivot) > hips > spine > head
+                             > arm_L > hand_L
+                             > arm_R > hand_R   (weapon socket: the runtime parents the weapon here)
+                      hips > leg_L, leg_R
+```
+
+Parts are rigidly weighted (one bone per part) and joined into one mesh so a character costs one
+primitive per material. Clips are authored as keyframed poses in `build_characters.py` and
+exported as NLA tracks: `ANM_Idle`, `ANM_Aim`, `ANM_Walk`, `ANM_Run`, `ANM_Fire`, `ANM_Reload`,
+`ANM_Hit`, `ANM_Death`, `ANM_Kick`. The runtime (`src/entities/CharacterRig.js`) blends
+Idle/Walk/Run by speed and plays the others as one-shots; the whole body yaws toward the aim.
+A rigid-part fallback (named pivots, procedural swing) remains for assets without a skin.
 
 Generated library (47 assets, ~340 KB of GLB, source `.blend` files under `blender/`):
 
@@ -95,15 +108,16 @@ LOD0 for hero assets viewed close (Ray, weapons in hand). LOD1 for enemies and f
 trees and rocks (instanced). The runtime picks by distance; generated prototypes currently ship a
 single LOD.
 
-## Rigging and animation (target)
+## Rigging and animation
 
-- Humanoid rig with a shared skeleton across all characters so animations retarget.
-- Required ExMob actions: Idle, Walk, Run, Aim, Fire_Pistol, Reload_Pistol, Fire_Shotgun,
-  Reload_Shotgun, Hit, Death, Dodge (optional).
-- Required enemy actions: Idle, Walk, Run, Aim, Fire, Reload, Hit, Death, Breach_Door,
-  Window_Entry.
-- Export animations in the character GLB as named clips (`ANM_*`).
-- Root motion off; movement is driven by gameplay.
+- Shared humanoid skeleton across all characters (above) so clips retarget by construction.
+- Shipped clips: Idle, Aim, Walk, Run, Fire, Reload, Hit, Death, Kick (door breach).
+- Still to author: per-weapon fire/reload variants (shotgun, SMG), Dodge, Window_Entry. The
+  window climb is currently a procedural body bob over the sill.
+- Clips are stashed as NLA tracks named `ANM_*` and exported with `NLA_TRACKS` mode and forced
+  sampling at 24 fps.
+- Root motion off; movement is driven by gameplay. The Death clip pivots at `root` (the feet) so
+  the body falls away from the shooter when the runtime faces it toward the shot.
 
 ## Export (GLB)
 

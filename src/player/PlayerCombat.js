@@ -63,7 +63,7 @@ export class PlayerCombat {
 
   startReload() {
     const w = this.current;
-    if (this.reload.start(w, { x: this.p.x, z: this.p.z })) { this.events.emit(EV.PLAYER_RELOAD, { id: w.id, time: w.def.reloadTime }); this.emitAmmo(); }
+    if (this.reload.start(w, { x: this.p.x, z: this.p.z })) { this.p.rig.reload?.(); this.events.emit(EV.PLAYER_RELOAD, { id: w.id, time: w.def.reloadTime }); this.emitAmmo(); }
   }
 
   /** trigger: held state; precision: bool; aim dir {x,z}. */

@@ -15,7 +15,7 @@ export class Player {
     this.yaw = start.facing || 0;
     this.radius = this.def.radius;
     const gltf = world.assets.instance(this.def.model);
-    this.rig = new CharacterRig({ look: this.def.look, height: this.def.height, width: this.def.look.width, gltf, weaponId: 'pistol', assets: world.assets });
+    this.rig = new CharacterRig({ look: this.def.look, height: this.def.height, width: this.def.look.width, gltf, clips: world.assets.clips(this.def.model), weaponId: 'pistol', assets: world.assets });
     world.scene.add(this.rig.root);
     this.health = new PlayerHealth(this, this.def.health);
     this.movement = new PlayerMovement(this, this.def);

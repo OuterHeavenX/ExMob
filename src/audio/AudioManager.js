@@ -22,6 +22,37 @@ export class AudioManager {
     window.addEventListener('keydown', this._pendingUnlock, { once: true });
     this.maxVoices = 24;
     this._voices = 0;
+    this.buffers = new Map();   // sfx id -> AudioBuffer[]
+    this.filesLoaded = false;
+    this.useFiles = true;
+  }
+
+  /** Load baked/recorded SFX listed in assets/audio/manifest.json (served at /audio/). */
+  async loadFiles(base = 'audio/') {
+    if (!this.ctx || this.filesLoaded) return;
+    this.filesLoaded = true;
+    let manifest;
+    try {
+      const res = await fetch(base + 'manifest.json', { cache: 'no-cache' });
+      if (!res.ok) return;
+      manifest = await res.json();
+    } catch { return; }
+    const jobs = [];
+    for (const [id, files] of Object.entries(manifest.sfx || {})) {
+      jobs.push((async () => {
+        const decoded = [];
+        for (const f of files) {
+          try {
+            const r = await fetch(base + f);
+            if (!r.ok) continue;
+            decoded.push(await this.ctx.decodeAudioData(await r.arrayBuffer()));
+          } catch (e) { /* keep synth fallback for this id */ }
+        }
+        if (decoded.length) this.buffers.set(id, decoded);
+      })());
+    }
+    await Promise.all(jobs);
+    console.info(`[Audio] ${this.buffers.size} sfx ids loaded from files`);
   }
 
   unlock() {
@@ -43,6 +74,7 @@ export class AudioManager {
       this.applySettings(this.settings);
       this.unlocked = true;
       if (this.ctx.state === 'suspended') this.ctx.resume();
+      this.loadFiles();
     } catch (e) { console.warn('[Audio] unlock failed', e); }
   }
 
@@ -90,6 +122,15 @@ export class AudioManager {
     } else g.connect(bus);
     this._voices++;
     setTimeout(() => { this._voices--; try { g.disconnect(); } catch { /* ignore */ } }, 2500);
+    const bank = this.useFiles ? this.buffers.get(id) : null;
+    if (bank && bank.length) {
+      const src = this.ctx.createBufferSource();
+      src.buffer = bank[Math.floor(Math.random() * bank.length)];
+      src.playbackRate.value = (def.pitch || 1) * (opts.pitch || 1) * (0.97 + Math.random() * 0.06);
+      src.connect(out);
+      src.start();
+      return;
+    }
     synth(this.ctx, out, this.ctx.currentTime, { ...def, pitch: (def.pitch || 1) * (opts.pitch || 1), gain: 1 });
   }
 

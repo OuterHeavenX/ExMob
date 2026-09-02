@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 
-/** Pooled bullet-hole / dent decals: small textured planes snapped to the hit surface. */
+/**
+ * Bullet-hole / dent decals as ONE InstancedMesh (one draw call regardless of count).
+ * Small textured quads snapped to the hit surface; the pool overwrites the oldest entry.
+ */
 function holeTexture() {
   const c = document.createElement('canvas');
   c.width = c.height = 64;
@@ -21,34 +24,35 @@ export class Decals {
   constructor(scene, max = 64) {
     this.scene = scene;
     this.max = max;
-    this.items = [];
-    const tex = holeTexture();
-    const geo = new THREE.PlaneGeometry(0.16, 0.16);
-    for (let i = 0; i < max; i++) {
-      const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
-      m.visible = false;
-      m.renderOrder = 2;
-      scene.add(m);
-      this.items.push(m);
-    }
+    const mat = new THREE.MeshBasicMaterial({ map: holeTexture(), transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
+    this.mesh = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.16, 0.16), mat, max);
+    this.mesh.count = 0;
+    this.mesh.frustumCulled = false;
+    this.mesh.renderOrder = 2;
+    scene.add(this.mesh);
     this.cursor = 0;
-    this._n = new THREE.Vector3();
+    this.used = 0;
+    this._dummy = new THREE.Object3D();
+    this._target = new THREE.Vector3();
   }
 
   add(x, y, z, nx, nz, kind = 'hole', scale = 1) {
-    const m = this.items[this.cursor];
-    this.cursor = (this.cursor + 1) % this.max;
     const len = Math.hypot(nx, nz) || 1;
     nx /= len; nz /= len;
-    m.position.set(x + nx * 0.012, y, z + nz * 0.012);
-    this._n.set(x + nx, y, z + nz);
-    m.lookAt(this._n);
-    m.rotation.z = Math.random() * Math.PI;
+    const d = this._dummy;
+    d.position.set(x + nx * 0.012, y, z + nz * 0.012);
+    d.lookAt(this._target.set(x + nx, y, z + nz));
+    d.rotateZ(Math.random() * Math.PI);
     const s = (kind === 'dent' ? 0.7 : 1) * scale * (0.8 + Math.random() * 0.5);
-    m.scale.set(s, s, s);
-    m.visible = true;
+    d.scale.setScalar(s);
+    d.updateMatrix();
+    this.mesh.setMatrixAt(this.cursor, d.matrix);
+    this.cursor = (this.cursor + 1) % this.max;
+    this.used = Math.min(this.used + 1, this.max);
+    this.mesh.count = this.used;
+    this.mesh.instanceMatrix.needsUpdate = true;
   }
 
-  clear() { for (const m of this.items) m.visible = false; }
-  get count() { return this.items.filter((m) => m.visible).length; }
+  clear() { this.used = 0; this.cursor = 0; this.mesh.count = 0; }
+  get count() { return this.used; }
 }

@@ -186,26 +186,28 @@ export class CabinBuilder {
     pane.position.set(0, wh / 2, 0);
     pane.name = 'pane';
     g.add(pane);
-    // boards (hidden until boarded)
-    const boards = new THREE.Group();
+    // boards (hidden until boarded): one merged mesh
+    const boardGeos = [];
     for (let i = 0; i < 3; i++) {
-      const b = new THREE.Mesh(new THREE.BoxGeometry(WW + 0.3, 0.16, 0.04), this.M.boards);
-      b.position.set((i - 1) * 0.05, 0.2 + i * 0.4, (horizontal ? 1 : 1) * (T / 2 + 0.03));
-      b.rotation.z = (i - 1) * 0.08;
-      b.castShadow = true;
-      boards.add(b);
+      const bg = new THREE.BoxGeometry(WW + 0.3, 0.16, 0.04);
+      bg.rotateZ((i - 1) * 0.08);
+      bg.translate((i - 1) * 0.05, 0.2 + i * 0.4, T / 2 + 0.03);
+      boardGeos.push(bg);
     }
+    const boards = new THREE.Mesh(mergeGeometries(boardGeos, false), this.M.boards);
+    boards.castShadow = true;
     boards.visible = false;
     g.add(boards);
-    // shattered remnants: jagged shards along the frame
-    const shards = new THREE.Group();
+    // shattered remnants: jagged shards along the frame, one merged mesh
+    const shardGeos = [];
     for (let i = 0; i < 6; i++) {
-      const s = new THREE.Mesh(new THREE.PlaneGeometry(0.12 + Math.random() * 0.15, 0.1 + Math.random() * 0.2), this.M.glass);
+      const sg = new THREE.PlaneGeometry(0.12 + Math.random() * 0.15, 0.1 + Math.random() * 0.2);
       const edge = i % 2 ? -1 : 1;
-      s.position.set(i < 4 ? (-WW / 2 + 0.1 + i * (WW / 3.2)) : edge * (WW / 2 - 0.08), i < 4 ? (i % 2 ? wh - 0.1 : 0.1) : wh / 2, 0);
-      s.rotation.z = (Math.random() - 0.5) * 0.8;
-      shards.add(s);
+      sg.rotateZ((Math.random() - 0.5) * 0.8);
+      sg.translate(i < 4 ? (-WW / 2 + 0.1 + i * (WW / 3.2)) : edge * (WW / 2 - 0.08), i < 4 ? (i % 2 ? wh - 0.1 : 0.1) : wh / 2, 0);
+      shardGeos.push(sg);
     }
+    const shards = new THREE.Mesh(mergeGeometries(shardGeos, false), this.M.glass);
     shards.visible = false;
     g.add(shards);
     this.root.add(g);
@@ -226,12 +228,14 @@ export class CabinBuilder {
     door.castShadow = true;
     door.receiveShadow = true;
     door.name = 'door';
-    // panels
+    // panels (one merged mesh)
+    const panelGeos = [];
     for (let i = 0; i < 2; i++) {
-      const p = new THREE.Mesh(new THREE.BoxGeometry(DW * 0.7, dh * 0.36, 0.02), this.M.trim);
-      p.position.set(0, -dh / 4 + i * dh / 2, 0.035);
-      door.add(p);
+      const pg = new THREE.BoxGeometry(DW * 0.7, dh * 0.36, 0.02);
+      pg.translate(0, -dh / 4 + i * dh / 2, 0.035);
+      panelGeos.push(pg);
     }
+    door.add(new THREE.Mesh(mergeGeometries(panelGeos, false), this.M.trim));
     const knob = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), this.M.metal);
     knob.position.set(-hingeSide * (DW - 0.12), dh / 2 - 0.05, 0.05);
     g.add(door, knob);

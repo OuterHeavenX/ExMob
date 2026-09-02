@@ -50,7 +50,8 @@ bloom in it.
 **Particles:** pooled `Points` systems per particle family with a custom shader (size by
 distance, soft alpha), CPU-simulated for small counts. Instanced meshes for debris and glass.
 
-**Decals:** small textured planes snapped to the hit surface, pooled and capped.
+**Decals:** one InstancedMesh of small textured quads snapped to the hit surface (a single draw
+call regardless of count), capped per quality tier.
 
 **Texture compression:** KTX2/Basis when real textures arrive. Prototype assets use flat PBR
 colors.
@@ -59,8 +60,9 @@ colors.
 
 **LOD:** manual `_LOD` suffix convention; runtime `LOD` objects for trees/rocks.
 
-**Animation:** procedural part animation now (ADR-010); skeletal clips from Blender later with
-`AnimationMixer`, capped mixer updates for distant enemies.
+**Animation:** skeletal clips from Blender via `AnimationMixer` (v0.2.0); rigid-part procedural
+fallback for assets without a skin (ADR-010). Mixer update throttling for distant enemies is
+still planned.
 
 **Instancing:** `InstancedMesh` for trees, rocks, grass tufts, glass shards.
 

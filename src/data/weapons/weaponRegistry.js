@@ -7,7 +7,7 @@
 export const WEAPONS = Object.freeze({
   pistol: Object.freeze({
     id: 'pistol', name: 'PISTOL', family: 'pistols', slot: 0,
-    damage: 22, pellets: 1, rpm: 300, mode: 'semi',
+    damage: 24, pellets: 1, rpm: 300, mode: 'semi',
     magSize: 12, reserveStart: 60, reserveMax: 120,
     spreadDeg: 2.0, precisionSpreadMul: 0.5,
     falloffStart: 30, maxRange: 60, stagger: 0.25,

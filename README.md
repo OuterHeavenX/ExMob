@@ -87,6 +87,12 @@ tests/                Vitest unit tests
 tools/                Build and validation scripts
 ```
 
+## Play online
+
+Every push to `main` deploys the production build to GitHub Pages:
+https://outerheavenx.github.io/ExMob/ (works on phones and tablets; add `?dev=1` for the debug
+overlay).
+
 ## Documentation
 
 Start with [docs/GAME_DESIGN.md](docs/GAME_DESIGN.md) and

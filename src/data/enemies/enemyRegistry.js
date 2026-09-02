@@ -12,8 +12,8 @@ export const ENEMIES = Object.freeze({
     profile: {
       accuracy: 0.32, reactionTime: 0.9, burst: { count: 2, interval: 0.32 }, fireCooldown: 1.4,
       preferredRange: { min: 5, max: 11 }, aggression: 0.55, usesCover: false, coverSeekOnHit: false,
-      breachDamage: 12, breachInterval: 0.9, canEnterWindows: true, canBreachDoors: true,
-      retreatHealth: 0, strafe: 0.5, awarenessDecay: 6,
+      breachDamage: 8, breachInterval: 0.9, canEnterWindows: true, canBreachDoors: true,
+      retreatHealth: 0, strafe: 0.5, awarenessDecay: 6, keepRange: true,
     },
     barks: ['He\'s inside!', 'Easy money, they said.', 'Go around!'],
   }),

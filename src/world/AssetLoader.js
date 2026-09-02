@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { clone as skeletonClone } from 'three/addons/utils/SkeletonUtils.js';
 
 /**
  * GLB asset loader with a manifest (assets/models/manifest.json, served at /models/manifest.json
@@ -58,7 +59,16 @@ export class AssetLoader {
   instance(name) {
     const p = this.cache.get(name);
     if (!p || !p._resolved) return null;
-    return p._resolved.scene.clone(true);
+    const scene = p._resolved.scene;
+    let skinned = false;
+    scene.traverse((o) => { if (o.isSkinnedMesh) skinned = true; });
+    return skinned ? skeletonClone(scene) : scene.clone(true);
+  }
+
+  /** Animation clips of a loaded asset (shared, immutable), or []. */
+  clips(name) {
+    const p = this.cache.get(name);
+    return p && p._resolved ? (p._resolved.animations || []) : [];
   }
 
   /** Resolve promises into `_resolved` so instance() can be synchronous after preload. */

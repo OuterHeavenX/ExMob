@@ -18,6 +18,19 @@ function wantsToPush(e) {
   return false;
 }
 
+/** Non-aggressive archetypes step back when the player closes inside their preferred range. */
+function backOff(e, dt) {
+  const pr = prof(e).preferredRange;
+  const aggression = prof(e).aggression * (e.world.difficulty.aggression || 1);
+  if (aggression >= 0.75 || e.combat.distance > pr.min * 0.85) return false;
+  const p = player(e);
+  const dx = e.x - p.x, dz = e.z - p.z, d = Math.hypot(dx, dz) || 1;
+  const sp = e.def.speed * 0.6;
+  const moved = e.moveBy((dx / d) * sp * dt, (dz / d) * sp * dt);
+  e.speedNorm = 0.5;
+  return moved > sp * dt * 0.2;
+}
+
 function strafe(e, dt) {
   const s = prof(e).strafe;
   if (s <= 0) { e.speedNorm = 0; return; }
@@ -70,7 +83,7 @@ export const BEHAVIORS = {
       if (prof(e).usesCover && t > 2.5 + Math.random() * 2) return 'SEEK_COVER';
       // enforcers: too far -> push
       if (c.distance > prof(e).preferredRange.max) return 'APPROACH';
-      strafe(e, dt);
+      if (!backOff(e, dt)) strafe(e, dt);
       return null;
     },
     onHit(e) {
@@ -133,7 +146,7 @@ export const BEHAVIORS = {
       e.breachT -= dt;
       if (e.breachT <= 0) {
         e.breachT = prof(e).breachInterval;
-        e.rig.kick(0.8);
+        e.rig.breach();
         if (pm.breach.hit(e, e.breachPortal)) return 'ENTER_BUILDING';
         e.breachTotal++;
         if (e.breachTotal === 1 && portal.kind === 'door' && Math.random() < 0.6) e.world.events.emit(EV.TOAST, { text: `${portal.name}: BREACHING` });

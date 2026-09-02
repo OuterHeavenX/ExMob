@@ -20,7 +20,7 @@ feel first, balance second, and every weapon should feel good on the first pull.
 
 | Weapon | Damage | Pellets | RPM | Mag | Reserve start | Spread (deg) | Range falloff | Stagger |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Pistol | 22 | 1 | 300 (semi) | 12 | 60 | 2.0 | 30 m | low |
+| Pistol | 24 | 1 | 300 (semi) | 12 | 60 | 2.0 | 30 m | low |
 | Revolver | 60 | 1 | 120 (semi) | 6 | 24 | 1.2 | 40 m | high |
 | Shotgun | 14 | 8 | 70 (pump) | 6 | 18 | 9.0 | 14 m | high |
 | SMG | 15 | 1 | 720 (auto) | 30 | 120 | 4.5 | 25 m | low |

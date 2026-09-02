@@ -1,0 +1,138 @@
+{
+  "generated": "2026-09-02T22:28:46.122Z",
+  "sampleRate": 32000,
+  "note": "Synthesized placeholders rendered offline. Replace files per id with recorded SFX.",
+  "sfx": {
+    "pistol_fire": [
+      "sfx/pistol_fire_1.wav",
+      "sfx/pistol_fire_2.wav",
+      "sfx/pistol_fire_3.wav"
+    ],
+    "revolver_fire": [
+      "sfx/revolver_fire_1.wav",
+      "sfx/revolver_fire_2.wav",
+      "sfx/revolver_fire_3.wav"
+    ],
+    "shotgun_fire": [
+      "sfx/shotgun_fire_1.wav",
+      "sfx/shotgun_fire_2.wav",
+      "sfx/shotgun_fire_3.wav"
+    ],
+    "smg_fire": [
+      "sfx/smg_fire_1.wav",
+      "sfx/smg_fire_2.wav",
+      "sfx/smg_fire_3.wav",
+      "sfx/smg_fire_4.wav"
+    ],
+    "dry_fire": [
+      "sfx/dry_fire_1.wav"
+    ],
+    "pistol_reload": [
+      "sfx/pistol_reload_1.wav"
+    ],
+    "revolver_reload": [
+      "sfx/revolver_reload_1.wav"
+    ],
+    "smg_reload": [
+      "sfx/smg_reload_1.wav"
+    ],
+    "shotgun_shell": [
+      "sfx/shotgun_shell_1.wav",
+      "sfx/shotgun_shell_2.wav"
+    ],
+    "shotgun_pump": [
+      "sfx/shotgun_pump_1.wav"
+    ],
+    "impact_wood": [
+      "sfx/impact_wood_1.wav",
+      "sfx/impact_wood_2.wav",
+      "sfx/impact_wood_3.wav",
+      "sfx/impact_wood_4.wav"
+    ],
+    "impact_metal": [
+      "sfx/impact_metal_1.wav",
+      "sfx/impact_metal_2.wav",
+      "sfx/impact_metal_3.wav"
+    ],
+    "impact_glass": [
+      "sfx/impact_glass_1.wav",
+      "sfx/impact_glass_2.wav"
+    ],
+    "impact_flesh": [
+      "sfx/impact_flesh_1.wav",
+      "sfx/impact_flesh_2.wav",
+      "sfx/impact_flesh_3.wav"
+    ],
+    "impact_dirt": [
+      "sfx/impact_dirt_1.wav",
+      "sfx/impact_dirt_2.wav",
+      "sfx/impact_dirt_3.wav"
+    ],
+    "door_kick": [
+      "sfx/door_kick_1.wav",
+      "sfx/door_kick_2.wav",
+      "sfx/door_kick_3.wav"
+    ],
+    "door_break": [
+      "sfx/door_break_1.wav",
+      "sfx/door_break_2.wav"
+    ],
+    "board_hit": [
+      "sfx/board_hit_1.wav",
+      "sfx/board_hit_2.wav",
+      "sfx/board_hit_3.wav"
+    ],
+    "door_open": [
+      "sfx/door_open_1.wav",
+      "sfx/door_open_2.wav"
+    ],
+    "prop_break": [
+      "sfx/prop_break_1.wav",
+      "sfx/prop_break_2.wav",
+      "sfx/prop_break_3.wav"
+    ],
+    "engine_arrive": [
+      "sfx/engine_arrive_1.wav"
+    ],
+    "car_door": [
+      "sfx/car_door_1.wav",
+      "sfx/car_door_2.wav"
+    ],
+    "cash_pickup": [
+      "sfx/cash_pickup_1.wav",
+      "sfx/cash_pickup_2.wav"
+    ],
+    "ui_click": [
+      "sfx/ui_click_1.wav"
+    ],
+    "ui_buy": [
+      "sfx/ui_buy_1.wav"
+    ],
+    "ui_denied": [
+      "sfx/ui_denied_1.wav"
+    ],
+    "wave_banner": [
+      "sfx/wave_banner_1.wav"
+    ],
+    "phone_buzz": [
+      "sfx/phone_buzz_1.wav"
+    ],
+    "player_hurt": [
+      "sfx/player_hurt_1.wav",
+      "sfx/player_hurt_2.wav",
+      "sfx/player_hurt_3.wav"
+    ],
+    "heartbeat": [
+      "sfx/heartbeat_1.wav"
+    ],
+    "dodge": [
+      "sfx/dodge_1.wav"
+    ],
+    "enemy_death": [
+      "sfx/enemy_death_1.wav",
+      "sfx/enemy_death_2.wav",
+      "sfx/enemy_death_3.wav",
+      "sfx/enemy_death_4.wav"
+    ]
+  }
+}

@@ -2,6 +2,27 @@
 
 All notable changes to EXMOB are documented here. The project uses semantic versioning.
 
+## [0.2.0] - 2026-09-02
+
+Priority pass after the first vertical slice.
+
+### Added
+- Skeletal character rigs from Blender: shared 10-bone skeleton, one skinned mesh per character,
+  nine keyframed clips (Idle, Aim, Walk, Run, Fire, Reload, Hit, Death, Kick) exported as NLA
+  tracks; runtime AnimationMixer blending with a rigid-part fallback.
+- File-based SFX pipeline: `tools/bake-sfx.mjs` renders 67 sample files (32 ids, with
+  variations) into `assets/audio`; AudioManager plays files with random variation and falls back
+  to realtime synthesis.
+- GitHub Pages deployment workflow (build + tests on every push to `main`).
+- GLB inspector tool (`tools/inspect-glb.mjs`).
+
+### Changed
+- Pistol damage 22 -> 24 (two shots on a Street Goon). Front/back door HP 120/100 -> 150/130.
+  Goon breach damage 12 -> 8.
+- Non-aggressive enemies back off when the player closes inside their preferred range.
+- Decals are one InstancedMesh; window boards/shards, door panels, GLB weapons and procedural
+  vehicles are merged. Combat draw calls ~343 (was 430-570).
+
 ## [0.1.0] - 2026-09-02
 
 First vertical slice: **Chapter 1 - The Cabin**.

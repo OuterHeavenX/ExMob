@@ -8,7 +8,7 @@
 - **Vitest** for unit tests.
 - No physics engine. Custom 2.5D kinematic controller and hitscan combat (ADR-004).
 - Custom grid navigation with A* and portal links (ADR-005).
-- **Web Audio API** with a bus graph; SFX are currently synthesized (ADR-007).
+- **Web Audio API** with a bus graph; SFX play from baked sample files with a synthesized fallback (ADR-007).
 - **IndexedDB** save store with localStorage fallback (ADR-008).
 - DOM/CSS for UI and HUD (ADR-009).
 
@@ -28,7 +28,7 @@ src/waves/                  WaveDirector, SpawnDirector
 src/property/               PropertyManager, DoorSystem, WindowSystem, BreachSystem, PropertyDamageSystem, BarricadeSystem
 src/economy/                EconomyManager, ShopManager
 src/progression/            BountyManager, CampaignManager
-src/entities/               Vehicle, CashPickup, CharacterRig (procedural part animation)
+src/entities/               Vehicle, CashPickup, CharacterRig (skeletal clips, rigid-part fallback)
 src/cinematics/             CinematicDirector + sequences (Intro, VehicleArrival, Compromised)
 src/audio/                  AudioManager (buses), SynthSFX, MusicDirector
 src/vfx/                    VFXManager, ParticlePool, MuzzleFlash, Tracers, Decals, Debris
