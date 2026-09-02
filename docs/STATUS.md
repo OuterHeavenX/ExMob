@@ -48,9 +48,10 @@ Windows 11, RTX 5080) unless stated otherwise.
 
 ## PARTIAL
 
-- **Smoke test harness** (`?dev=1&smoke=1`): implemented and runs; in the embedded test browser
-  used for this pass it completes slowly because the browser throttles timers. See KNOWN ISSUES
-  for the run result.
+- **Smoke test harness** (`?dev=1&smoke=1`): 13/13 checks pass (scene loads, nav bakes, player
+  moves and shoots, vehicle arrival spawns enemies, enemies die, wave 1 clears, wave 2 prep
+  starts, cash awarded, player dies, game over shown, retry restores, save persists). Run in the
+  embedded dev browser with `&catchup=1`; not yet run on a phone.
 - **Enemy AI**: SUPPRESS and REPOSITION are folded into ENGAGE/SEEK_COVER; SPECIAL_ACTION
   unused. Enemies always know the player's rough position (no hearing model).
 - **Cover**: automatic nodes from vehicles, near trees, and hand-placed data; no dynamic cover
