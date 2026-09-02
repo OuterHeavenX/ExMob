@@ -5,7 +5,7 @@ import { defineConfig } from 'vite';
 // `npm run dev` serves it over HTTP (required: ES modules + GLB assets cannot load over file://).
 export default defineConfig({
   base: './',
-  server: { port: 5173, open: false },
+  server: { port: Number(process.env.PORT) || 5173, strictPort: false, open: false },
   build: {
     target: 'es2022',
     sourcemap: true,

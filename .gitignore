@@ -15,5 +15,7 @@ Thumbs.db
 blender/**/*.blend1
 blender/**/*.blend2
 blender/**/__pycache__/
+# Blender export staging (runtime copies live in assets/models)
+blender/exports/
 # scratch
 tmp/
