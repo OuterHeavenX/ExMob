@@ -51,6 +51,19 @@ look at. Touch aiming therefore needs help that desktop does not, and it is data
 Measured effect (in-browser, deliberately sloppy swipe 20 degrees off a goon 6 m away, 10 shots):
 0/10 hits with assist off, 10/10 with STRONG, average aim error 20 degrees down to 1 degree.
 
+## Touch layering (do not regress this)
+
+`#ui` (z-index 10) holds every DOM panel and is `pointer-events: none`, with only `.ui-block`
+panels taking events. The touch layer must stay **below** it (z-index 8). If the touch layer is
+placed above `#ui` it covers the whole screen and swallows every tap meant for a panel: the
+between-wave SHOP and READY, shop items, the pause menu and the game over buttons all stop
+working, and tapping them starts a movement stick instead. This was shipped broken in v0.4.0 and
+fixed in v0.4.1. Because empty space is `pointer-events: none` all the way down, taps that miss a
+panel still reach the sticks.
+
+Between-wave actions live on the prep panel, not on floating touch buttons, so there is one
+tappable path rather than two.
+
 ## Safe areas
 
 The HUD and controls respect `env(safe-area-inset-*)`; `viewport-fit=cover` is set. Nothing

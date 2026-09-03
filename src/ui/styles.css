@@ -164,7 +164,8 @@ button { font-family: var(--font-display); letter-spacing: 0.12em; text-transfor
 .smoke-results { position: fixed; right: 8px; bottom: 8px; z-index: 60; background: rgba(0,0,0,0.85); color: #9f9; border: 1px solid #4a4; padding: 8px; font: 11px/1.4 Consolas, monospace; }
 
 /* touch controls */
-.touch-layer { position: fixed; inset: 0; z-index: 12; display: none; touch-action: none; }
+/* below #ui (z 10): panels must win taps, empty space falls through to the sticks */
+.touch-layer { position: fixed; inset: 0; z-index: 8; display: none; touch-action: none; }
 /* gameplay controls only: the title, pause and shop screens must not have buttons floating on them */
 body.in-game .touch-layer.active { display: block; pointer-events: auto; }
 .stick-base { position: absolute; width: calc(120px * var(--touch-scale)); height: calc(120px * var(--touch-scale)); margin-left: calc(-60px * var(--touch-scale)); margin-top: calc(-60px * var(--touch-scale)); border-radius: 50%; border: 2px solid rgba(236,228,210,0.35); background: rgba(0,0,0,0.25); pointer-events: none; }
@@ -187,7 +188,7 @@ body.touch-mode .hud .tr { right: calc(72px + var(--safe-r)); }
   .bar { width: 38vw; }
   .stat .v { font-size: 16px; }
   .prep { top: calc(10px + var(--safe-t)); padding: 6px 12px; }
-  .prep .row { display: none; }
+  .prep .btn.small { padding: 6px 12px; font-size: 11px; min-height: 34px; }
   .title-logo { font-size: 18vw; }
 }
 @media (max-height: 460px) {
@@ -207,6 +208,9 @@ body.touch-mode .hud .tr { right: calc(72px + var(--safe-r)); }
 @media (orientation: portrait) and (max-width: 720px) {
   body.in-game::after { content: "ROTATE YOUR DEVICE"; position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; background: rgba(5,7,12,0.92); font-family: var(--font-display); letter-spacing: 0.3em; }
 }
+
+/* the prep panel carries SHOP and READY on every screen, so touch needs no floating duplicates */
+.touch-btn-shop, .touch-btn-ready { display: none; }
 
 /* melee */
 .melee-hint { position: absolute; left: 50%; top: 63%; transform: translateX(-50%); display: none; align-items: center; gap: 8px; font-size: 13px; letter-spacing: 0.25em; color: var(--amber); text-shadow: 0 2px 8px #000; animation: meleePop 0.18s ease; }

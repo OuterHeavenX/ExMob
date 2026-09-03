@@ -35,11 +35,8 @@ export class TouchInput {
     if (!v) this._resetAll();
   }
 
-  setPhase(phase) {
-    // between-wave buttons
-    this.buttons.shop.hidden = phase !== 'prep';
-    this.buttons.ready.hidden = phase !== 'prep';
-  }
+  /** Between-wave actions live on the prep panel (see HUD), not on floating buttons. */
+  setPhase() {}
 
   /** Highlight MELEE while something is in reach so the action is discoverable on touch. */
   setMeleeReady(v) {
@@ -56,8 +53,7 @@ export class TouchInput {
   _buildButtons() {
     const defs = [
       ['melee', '✊', 'MELEE'], ['interact', 'E', 'INTERACT'], ['reload', 'R', 'RELOAD'],
-      ['weaponCycle', 'Q', 'WEAPON'], ['dodge', '⤳', 'DODGE'],
-      ['shop', '$', 'SHOP'], ['ready', '▶', 'READY'], ['pause', 'II', 'PAUSE'],
+      ['weaponCycle', 'Q', 'WEAPON'], ['dodge', '⤳', 'DODGE'], ['pause', 'II', 'PAUSE'],
     ];
     const cluster = el('div', { class: 'touch-buttons' });
     for (const [action, glyph, label] of defs) {
@@ -72,8 +68,6 @@ export class TouchInput {
       cluster.appendChild(b);
     }
     this.root.appendChild(cluster);
-    this.buttons.shop.hidden = true;
-    this.buttons.ready.hidden = true;
   }
 
   _bind() {

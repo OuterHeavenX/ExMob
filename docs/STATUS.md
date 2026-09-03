@@ -1,6 +1,6 @@
 # EXMOB - STATUS
 
-Honest state of every system as of **v0.4.0** (2026-09-03). Rule 17 of AGENTS.md: nothing here is
+Honest state of every system as of **v0.4.1** (2026-09-03). Rule 17 of AGENTS.md: nothing here is
 marked working unless it was exercised. "Tested" means exercised in the dev browser (Chromium,
 Windows 11, RTX 5080) unless stated otherwise.
 
@@ -80,6 +80,9 @@ Windows 11, RTX 5080) unless stated otherwise.
 - **Difficulty**: NORMAL balanced by feel only (no playtest data). HARD / VERY HARD are data.
 - **Vehicles**: drive, park, headlights, cover; no drive-bys, no player driving.
 - **Performance scaling**: presets work; automatic step-down under load is not enabled.
+- **Mobile UI**: verified by hit-testing on an 844x390 landscape viewport that the prep panel
+  SHOP/READY, shop items (including the scrolled-to-bottom CLOSE/READY), the pause menu and the
+  game over buttons all receive their taps, while empty space still drives the sticks.
 - **Mobile**: touch controls implemented (floating dual sticks, buttons, safe areas, rotate
   prompt, aim line, aim assist) and exercised with synthetic pointer events in a 844x390 landscape
   viewport in the desktop browser. Still not tested on a physical phone or tablet: thumb comfort,

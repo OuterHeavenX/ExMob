@@ -2,6 +2,17 @@
 
 All notable changes to EXMOB are documented here. The project uses semantic versioning.
 
+## [0.4.1] - 2026-09-03
+
+### Fixed
+- **Touch taps never reached the UI.** The touch layer covered the screen above `#ui`, so during
+  gameplay every panel button was unreachable on a phone and tapping one started a movement stick
+  instead: the between-wave SHOP and READY, every shop item, the pause menu, and the game over
+  buttons (a mobile player who died could not press RETRY WAVE). The touch layer now sits below
+  `#ui`; panels take their own taps and empty space still falls through to the sticks.
+- Removed the floating SHOP/READY touch buttons that duplicated the prep panel and sat over the
+  play area. The prep panel row is now shown on every screen size.
+
 ## [0.4.0] - 2026-09-03
 
 Playtest feedback: shooting on a phone meant swiping toward an enemy and hoping.
