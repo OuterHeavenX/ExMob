@@ -32,7 +32,7 @@ export class TitleScreen {
       ]),
       menu,
       el('div', { class: 'title-version', text: `v${VERSION}` }),
-      el('div', { class: 'title-hint', text: ctx.input.mode === 'touch' ? 'TOUCH: LEFT STICK MOVE, RIGHT STICK AIM + FIRE' : 'WASD MOVE  ·  MOUSE AIM  ·  LMB FIRE  ·  E INTERACT  ·  R RELOAD  ·  SPACE DODGE' }),
+      el('div', { class: 'title-hint', text: ctx.input.mode === 'touch' ? 'TOUCH: LEFT STICK MOVE, RIGHT STICK AIM + FIRE' : 'WASD MOVE  ·  MOUSE AIM  ·  LMB FIRE  ·  F MELEE  ·  E INTERACT  ·  R RELOAD  ·  SPACE DODGE' }),
     );
   }
 
