@@ -59,7 +59,7 @@ export class SpawnDirector {
     for (const v of this.vehicles) v.dispose();
     this.vehicles.length = 0;
     this.usedSlots.clear();
-    this.world.navDirty = true;
+    // each dispose() removed its collider, which queues its area for an incremental re-bake
   }
 
   update(dt) { for (const v of this.vehicles) v.update(dt); }

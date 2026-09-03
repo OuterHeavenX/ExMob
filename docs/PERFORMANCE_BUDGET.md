@@ -38,6 +38,35 @@ numbers are recorded in STATUS.md, never here.
 | Tree (instanced) | 400 |
 | Rock | 150 |
 
+## Frame spikes
+
+Average frame rate hides stutter completely: one 67 ms frame in an otherwise perfect minute is
+invisible in an FPS counter and very visible to a player. Simulation spikes are therefore budgeted
+separately from the steady-state costs above.
+
+| Simulation event | Budget | Measured (desktop, v0.5.0) |
+| --- | --- | --- |
+| Door opened, closed or broken | 2 ms | 0.7 ms (48 nav cells re-baked) |
+| Window shattered or boarded | 2 ms | 0.1 ms |
+| Destructible prop destroyed | 2 ms | 1.3 ms |
+| Vehicle arrival | 2 ms | 0.5 ms |
+| Single path request | 3 ms | 0.4-2.4 ms |
+| All active enemies re-planning at once | 8 ms | 3.8 ms (8 enemies) |
+| Enemy spawn | 4 ms | 1.4 ms recycled rig, 2.9 ms cold |
+| Worst frame over a full wave | 8 ms | 5.6 ms |
+
+Rules that keep it there:
+
+- **Never re-bake the whole navigation grid at runtime.** A full bake is ~67 ms. Changes go
+  through `ColliderSet.invalidate` (or `setWalk`/`add`/`remove`, which call it) so `NavGrid`
+  re-bakes only the affected cells. `invalidateAll` is reserved for wholesale state restores.
+- Anything that becomes visible for the first time mid-fight must have its shader compiled at
+  scene load (`CabinScene._prewarmShaders`).
+- Per-spawn allocation is pooled where the object is expensive: enemy rigs, particles, decals,
+  debris, tracers, cash pickups.
+- The debug overlay's worst-frame and long-frame counters are the check. Reset them, play a wave,
+  and read them back.
+
 ## Rules
 
 - Optimize before raising any cap (AGENTS.md rule 13).

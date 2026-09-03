@@ -13,7 +13,8 @@ export class GameLoop {
     this._acc = 0;
     this.paused = false;
     this.timeScale = 1;
-    this.stats = { fps: 0, frameMs: 0, simMs: 0, renderMs: 0, frames: 0 };
+    this.stats = { fps: 0, frameMs: 0, simMs: 0, renderMs: 0, frames: 0, worstMs: 0, longFrames: 0 };
+    this.longFrameMs = 33; // two dropped frames at 60 Hz
     this._fpsAcc = 0;
     this._fpsFrames = 0;
     this._raf = 0;
@@ -37,6 +38,9 @@ export class GameLoop {
       }
     }, 16);
   }
+
+  /** Clear the worst-frame and long-frame counters (debug overlay button). */
+  resetSpikes() { this.stats.worstMs = 0; this.stats.longFrames = 0; }
 
   stop() {
     this._running = false;
@@ -75,6 +79,9 @@ export class GameLoop {
     this.stats.renderMs = end - simEnd;
     this.stats.frameMs = end - frameStart;
     this.stats.frames++;
+    // spike tracking: a stutter is one long frame, which an average frame rate hides completely
+    if (this.stats.frameMs > this.stats.worstMs) this.stats.worstMs = this.stats.frameMs;
+    if (this.stats.frameMs > this.longFrameMs) this.stats.longFrames++;
     this._fpsAcc += dt;
     this._fpsFrames++;
     if (this._fpsAcc >= 0.5) {

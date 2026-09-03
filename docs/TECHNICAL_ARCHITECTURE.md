@@ -88,8 +88,10 @@ emissive lamp materials, pooled muzzle point lights, instanced trees/rocks/grass
 
 - Object pools for projectiles/tracers, particles, decals, debris, muzzle lights, cash pickups.
 - Enemy active cap from WaveDirector, clamped by QualityManager.
-- Navigation: A* on a coarse grid (0.5 m), path requests budgeted per frame, path caching with
-  re-plan on portal state change.
+- Navigation: A* on a coarse grid (0.5 m) with a typed-array heap, path requests budgeted per
+  frame, re-plan on portal state change. The grid re-bakes incrementally from collider dirty
+  rectangles; a full bake is a load-time operation only (docs/PERFORMANCE_BUDGET.md, Frame spikes).
+- Shaders are compiled at scene load so nothing compiles mid-fight.
 - No per-frame allocations in hot loops (reused vectors).
 - Frustum culling on, shadow map updates on a budget, instancing for vegetation.
 - Budgets in PERFORMANCE_BUDGET.md.

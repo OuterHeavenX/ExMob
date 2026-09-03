@@ -1,6 +1,6 @@
 {
   "name": "exmob",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "EXMOB - a stylish browser-based 3D action-survival game. Chapter 1: The Cabin.",
   "type": "module",
   "private": true,

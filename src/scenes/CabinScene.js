@@ -108,6 +108,7 @@ export class CabinScene {
       ctx.quality.onChange((p) => { world.waves.capClamp = p.maxActiveEnemies; }),
     ];
     wallFader.setInside(world.property.isInside(world.player.x, world.player.z));
+    this._prewarmShaders(ctx, scene);
     ctx.camera.snap();
     ctx.camera.zoomTarget = 1;
     ctx.camera.setOverride(null);
@@ -127,6 +128,19 @@ export class CabinScene {
       world.waves.start(startIndex);
     }
     if (CONFIG.smokeTest) this.smoke = new SmokeTest(ctx, world).run();
+  }
+
+  /**
+   * Compile every material before gameplay starts. Three only compiles what is visible, and most
+   * effect meshes (tracers, decals, debris, muzzle sprites, the aim line) start hidden, so their
+   * shaders would otherwise compile on first use: a hitch on the first shot, the first broken
+   * window and the first body.
+   */
+  _prewarmShaders(ctx, scene) {
+    const hidden = [];
+    scene.traverse((o) => { if (!o.visible) { hidden.push(o); o.visible = true; } });
+    try { ctx.renderer.gl.compile(scene, ctx.camera.camera); } catch (e) { console.warn('[EXMOB] shader prewarm failed', e); }
+    for (const o of hidden) o.visible = false;
   }
 
   onPlayerDeath() {
@@ -167,7 +181,9 @@ export class CabinScene {
 
     w.pathBudget = ctx.quality.preset.pathRequestsPerFrame;
     w.los.beginFrame();
-    if (w.navDirty || w.nav.bakedVersion !== w.colliders.version) { w.nav.bake(); w.navDirty = false; }
+    // only the cells around whatever changed: a full bake is ~67 ms and would drop four frames
+    if (w.navDirty) { w.colliders.invalidateAll(); w.navDirty = false; }
+    w.nav.applyDirty(w.colliders);
 
     w.player.update(dt);
     w.enemies.update(dt);

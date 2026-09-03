@@ -2,6 +2,40 @@
 
 All notable changes to EXMOB are documented here. The project uses semantic versioning.
 
+## [0.5.0] - 2026-09-03
+
+Playtest feedback: the game stutters occasionally.
+
+### Fixed
+- **The stutter.** The navigation grid was fully re-baked whenever anything changed its
+  walkability, which is 14,208 cells and **67 ms**, or four dropped frames. It fired on every door
+  opening or breaking, every window shattered, every destructible prop, and every arriving car.
+  `ColliderSet` now records a dirty rectangle per change and `NavGrid.applyDirty` re-bakes only
+  those cells: a door costs **0.7 ms** (48 cells), a shattered window 0.1 ms, a destroyed prop
+  1.3 ms. A unit test asserts the incremental result is byte-identical to a full bake.
+- A parking car and a cleared car each forced a full re-bake on top of that, because they set a
+  "rebuild everything" flag even though adding or removing their collider already registered the
+  area. That was a 69 ms hitch at the exact moment a wave's vehicle arrived.
+- Shaders are compiled up front. Three only compiles what is visible, and effect meshes (tracers,
+  decals, debris, muzzle sprites, the aim line) start hidden, so their shaders used to compile on
+  first use: a hitch on the first shot, the first broken window and the first body.
+
+### Changed
+- A* uses a binary heap over typed arrays instead of allocating an object per push, and path
+  smoothing uses a bounded look-ahead instead of scanning to the end of the path (which was
+  quadratic). A path now costs 0.4-2.4 ms; eight enemies re-planning in the same frame cost 3.8 ms
+  in total. A greedy heuristic was tried and rejected: it drives into the cabin wall and then
+  explores badly, making the common driveway-to-bedroom route twice as slow.
+- Enemy rigs are recycled from removed bodies rather than rebuilt, halving the cost of a
+  reinforcement spawn (2.9 ms to 1.4 ms).
+- The debug overlay tracks the worst frame and counts frames over 33 ms, with RESET SPIKES and
+  REBAKE NAV buttons, so a stutter can be caught rather than guessed at.
+
+### Measured
+Simulating a full wave (2,400 frames, vehicle arrival, breaching, deaths, a destroyed prop and a
+shattered window): worst frame **5.6 ms**, median 0.1 ms, **zero** frames over 8 ms. Before this
+release a single door opening cost 67 ms on its own.
+
 ## [0.4.1] - 2026-09-03
 
 ### Fixed

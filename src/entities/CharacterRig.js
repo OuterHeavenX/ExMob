@@ -200,6 +200,50 @@ export class CharacterRig {
 
   reload() { if (this.skeletal) this._oneShot('reload', 1, 0.08); }
 
+  /**
+   * Put a recycled rig back into its spawn state. Building a rig costs a skinned-mesh clone plus
+   * a fresh AnimationMixer, which is most of an enemy spawn, so bodies hand their rig back to the
+   * pool instead (see EnemyManager).
+   */
+  resetForReuse(weaponId) {
+    this.dead = false;
+    this.deathT = 0;
+    this.swingT = 0;
+    this.recoil = 0;
+    this.flinch = 0;
+    this.speedNorm = 0;
+    this.walkPhase = 0;
+    this.body.rotation.set(0, 0, 0);
+    this.body.position.set(0, 0, 0);
+    if (this.blob) this.blob.material.opacity = 0.35;
+    if (this.skeletal && this.mixer) {
+      this.mixer.stopAllAction();
+      for (const k of ['idle', 'walk', 'run']) {
+        const a = this.actions[k];
+        if (!a) continue;
+        a.reset();
+        a.enabled = true;
+        a.setEffectiveTimeScale(1);
+        a.setEffectiveWeight(k === 'idle' ? 1 : 0);
+        a.play();
+      }
+      for (const k of ['fire', 'reload', 'hit', 'kick', 'melee', 'death']) {
+        const a = this.actions[k];
+        if (!a) continue;
+        a.stop();
+        a.enabled = false;
+        a.setEffectiveWeight(0);
+      }
+      this.mixer.update(0);
+    } else {
+      for (const n of ['Head', 'Torso', 'ArmL', 'ArmR', 'LegL', 'LegR']) {
+        const part = this.parts[n];
+        if (part) part.rotation.set(0, 0, 0);
+      }
+    }
+    if (weaponId && weaponId !== this.weaponId) this.setWeapon(weaponId);
+  }
+
   /** Weapon-butt swing. Skeletal clip when available, procedural arm swing otherwise. */
   melee() {
     if (this.skeletal && this._oneShot('melee', 1.5, 0.02)) return;

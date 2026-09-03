@@ -45,7 +45,13 @@ are special cells with a portal id. `AStar` finds paths; closed portals cost ext
 traversable in planning, so enemies naturally choose the nearest entry and breach it. Windows are
 only traversable for archetypes with `canEnterWindows`.
 
-Paths are smoothed with a simple line-of-walk pass. Path requests are budgeted per frame.
+Baking the grid over the whole property costs about 67 ms, so it happens once at load. After
+that, collider changes (a door opening, a prop destroyed, a car parking) record a dirty rectangle
+and only those cells are re-baked, which costs well under a millisecond. `NavGrid.applyDirty` is
+called once per frame and is a no-op when nothing changed.
+
+Paths are smoothed with a bounded line-of-walk pass (scanning the whole path is quadratic). Path
+requests are budgeted per frame.
 Re-plans are triggered by portal state changes, target changes, or a stuck timer (an enemy that
 has not moved in 1.5 s re-plans and, if still stuck, picks a new entry). The stuck timer is the
 guard against "trapped on furniture".

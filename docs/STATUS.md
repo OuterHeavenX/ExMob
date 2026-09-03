@@ -1,6 +1,6 @@
 # EXMOB - STATUS
 
-Honest state of every system as of **v0.4.1** (2026-09-03). Rule 17 of AGENTS.md: nothing here is
+Honest state of every system as of **v0.5.0** (2026-09-03). Rule 17 of AGENTS.md: nothing here is
 marked working unless it was exercised. "Tested" means exercised in the dev browser (Chromium,
 Windows 11, RTX 5080) unless stated otherwise.
 
@@ -52,9 +52,14 @@ Windows 11, RTX 5080) unless stated otherwise.
 - **Debug**: F3 overlay with FPS, frame/sim/render ms, draw calls, triangles, enemy states,
   particle/decal/debris counts; cheats (god, cash, start/skip wave, kill all, heal, spawn by
   archetype); AI path and nav grid visualization.
-- **Tests**: 68 Vitest unit tests pass (`npm test`), including melee arc geometry, target
-  selection, melee balance intent, aim assist cone/snap/pull behaviour, and the save v1 -> v2
-  migration. Registry validation passes.
+- **Frame spikes**: fixed and measured. Simulating a full wave (2,400 frames with a vehicle
+  arrival, breaching, deaths, a destroyed prop and a shattered window) the worst frame is 5.6 ms
+  with zero frames over 8 ms; previously a single door opening cost 67 ms on its own. Budgets and
+  per-event numbers are in docs/PERFORMANCE_BUDGET.md.
+- **Tests**: 72 Vitest unit tests pass (`npm test`), including melee arc geometry, target
+  selection, melee balance intent, aim assist cone/snap/pull behaviour, incremental navigation
+  baking (asserted identical to a full bake), and the save v1 -> v2 migration. Registry validation
+  passes.
 - **Blender pipeline**: headless generator scripts export 47 GLB prototypes with a manifest;
   the runtime loads them (skinned characters with clips, weapons in hand, props, sedan).
 - **Skeletal animation**: all five characters are skinned to a shared skeleton with Idle/Aim/
@@ -123,6 +128,9 @@ Windows 11, RTX 5080) unless stated otherwise.
   A normal Chromium window measured 240 fps at HIGH (uncapped) on the RTX 5080 dev machine.
 - Enemies now back off inside their preferred range, but still bunch up in doorways when
   several arrive together.
+- All frame timings above are simulation cost on the desktop dev machine, measured by stepping
+  the loop directly. Rendering cost and phone hardware are not included: the stutter fix has not
+  been confirmed on a physical device.
 - Aim assist helps only inside its cone: a swipe more than 26 degrees off target is still a
   miss, by design. LIGHT (14 degree cone) does nothing for large errors.
 - The aim line is drawn on the ground plane, so it reads oddly across the porch step where the

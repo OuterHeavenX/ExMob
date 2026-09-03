@@ -6,11 +6,19 @@ import { circleVsAABB, rayVsAABB, segSegT } from '../utils/math.js';
  *  bullets blocks hitscan projectiles (and receives hits)
  *  los     blocks AI line of sight
  * Portals and props toggle flags as their state changes; the box object identity is stable.
+ *
+ * Walkability changes are recorded as dirty rectangles so the navigation grid can re-bake only
+ * the cells that actually changed. Re-baking the whole grid takes ~67 ms, which is four dropped
+ * frames every time a door opens, so `version` alone is not enough: see NavGrid.applyDirty.
  */
+const MAX_DIRTY_RECTS = 24;
+
 export class ColliderSet {
   constructor() {
     this.boxes = [];
     this.version = 0; // bumped when walkability changes (nav grid re-bake trigger)
+    this._dirty = [];
+    this._dirtyFull = false;
   }
 
   add(box) {
@@ -20,16 +28,38 @@ export class ColliderSet {
     box.surface = box.surface || 'wood';
     box.height = box.height ?? 2.8;
     this.boxes.push(box);
-    if (box.walk) this.version++;
+    if (box.walk) this.invalidate(box);
     return box;
   }
 
   remove(box) {
     const i = this.boxes.indexOf(box);
-    if (i >= 0) { this.boxes.splice(i, 1); this.version++; }
+    if (i >= 0) { this.boxes.splice(i, 1); this.invalidate(box); }
   }
 
-  setWalk(box, v) { if (box.walk !== v) { box.walk = v; this.version++; } }
+  setWalk(box, v) { if (box.walk !== v) { box.walk = v; this.invalidate(box); } }
+
+  /**
+   * Record that this box's walkability changed. Bumps `version` and remembers the area so the
+   * nav grid can re-bake just that patch. Call this instead of touching `version` directly.
+   */
+  invalidate(box) {
+    this.version++;
+    if (this._dirtyFull) return;
+    if (this._dirty.length >= MAX_DIRTY_RECTS) { this._dirtyFull = true; this._dirty.length = 0; return; }
+    this._dirty.push({ minX: box.minX, maxX: box.maxX, minZ: box.minZ, maxZ: box.maxZ });
+  }
+
+  /** Force the next nav bake to cover everything (scene load, snapshot restore). */
+  invalidateAll() { this.version++; this._dirtyFull = true; this._dirty.length = 0; }
+
+  /** Consume the pending changes. Returns { full, rects }. */
+  takeDirty() {
+    const r = { full: this._dirtyFull, rects: this._dirty };
+    this._dirty = [];
+    this._dirtyFull = false;
+    return r;
+  }
 
   /** Resolve a circle against walk boxes. Returns the corrected position. */
   resolveCircle(x, z, r, ignore = null) {

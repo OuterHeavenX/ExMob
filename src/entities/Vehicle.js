@@ -85,7 +85,7 @@ export class Vehicle {
     const sx = this.size.x * c + this.size.z * s, sz = this.size.x * s + this.size.z * c;
     this.box = this.world.colliders.add(ColliderSet.box(this.x, this.z, sx, sz, { kind: 'vehicle', surface: 'metal', height: 1.3, bullets: true, los: true }));
     this.coverNodes = this.world.cover.addFromBox(this.box, 0.8, 'vehicle');
-    this.world.navDirty = true;
+    // colliders.add already queued this box's area for an incremental nav re-bake
   }
 
   /** Drive path (array of {x,z}) then park at slot {x,z,rot}. */

@@ -24,6 +24,8 @@ export class DebugOverlay {
       b('AI VIZ', () => this.toggleAI()),
       b('NAV VIZ', () => this.toggleNav()),
       b('QUALITY-', () => ctx.quality.stepDown()),
+      b('RESET SPIKES', () => ctx.loop.resetSpikes()),
+      b('REBAKE NAV', () => { const t = performance.now(); world.colliders.invalidateAll(); world.nav.applyDirty(world.colliders); console.info('[EXMOB] full nav bake', (performance.now() - t).toFixed(1), 'ms'); }),
     ]), el('div', { class: 'dbg-row' }, Object.keys(ENEMIES).filter((k) => !ENEMIES[k].future).map((k) => b('SPAWN ' + k.toUpperCase(), () => {
       const p = world.player;
       world.enemies.spawn(k, p.x + (Math.random() - 0.5) * 8, p.z + 9 + Math.random() * 3, { initialState: 'APPROACH' });
@@ -89,6 +91,7 @@ export class DebugOverlay {
     this.stats.textContent = [
       `EXMOB DEBUG  v${this.ctx.version}  quality=${this.ctx.quality.label}  input=${this.ctx.input.mode}`,
       `fps ${s.fps}  frame ${s.frameMs.toFixed(1)}ms  sim ${s.simMs.toFixed(1)}ms  render ${s.renderMs.toFixed(1)}ms`,
+      `worst frame ${s.worstMs.toFixed(1)}ms  frames over ${this.ctx.loop.longFrameMs}ms: ${s.longFrames}  nav cells last bake ${w.nav.lastBakedCells}`,
       `draw calls ${r.render.calls}  tris ${r.render.triangles}  geoms ${r.memory.geometries}  tex ${r.memory.textures}`,
       `enemies active ${w.enemies.activeCount}/${w.waves.cap}  bodies ${w.enemies.list.length - w.enemies.activeCount}  queue ${w.waves.queue.length}  remaining ${w.waves.remaining}`,
       `wave ${w.waves.index + 1} phase ${w.waves.phase} t=${w.waves.timer.toFixed(1)}  states ${JSON.stringify(states)}`,

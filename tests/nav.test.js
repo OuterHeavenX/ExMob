@@ -53,3 +53,55 @@ describe('NavGrid + AStar', () => {
     for (const p of path) expect(c.circleOverlaps(p.x, p.z, 0.2, (b) => b.kind === 'wall')).toBeNull();
   });
 });
+
+describe('incremental baking', () => {
+  function makeWorld() {
+    const c = new ColliderSet();
+    c.add(ColliderSet.box(-4.75, 0, 8.5, 0.2, { kind: 'wall' }));
+    c.add(ColliderSet.box(4.75, 0, 8.5, 0.2, { kind: 'wall' }));
+    const door = c.add(ColliderSet.box(0, 0, 1, 0.2, { kind: 'door', walk: true }));
+    const crate = c.add(ColliderSet.box(3, 4, 1.2, 1.2, { kind: 'prop' }));
+    const portals = new Map([['door', { id: 'door', navBox: door }]]);
+    const grid = new NavGrid({ minX: -8, maxX: 8, minZ: -8, maxZ: 8, cell: 0.5 }, c, portals);
+    return { c, grid, door, crate };
+  }
+
+  const snapshot = (grid) => [Uint8Array.from(grid.walk), Int16Array.from(grid.portalIdx)];
+  const same = (a, b) => a.length === b.length && a.every((v, i) => v === b[i]);
+
+  it('a full bake clears the pending changes queued while building the level', () => {
+    const { c, grid } = makeWorld();
+    expect(grid.bakedVersion).toBe(c.version);
+    expect(grid.applyDirty(c)).toBe(0);
+  });
+
+  it('re-bakes only a patch around a changed collider, not the whole grid', () => {
+    const { c, grid, door } = makeWorld();
+    c.setWalk(door, false);
+    const cells = grid.applyDirty(c);
+    expect(cells).toBeGreaterThan(0);
+    expect(cells).toBeLessThan(grid.walk.length / 10);
+  });
+
+  it('incremental results are identical to a full re-bake', () => {
+    const { c, grid, door, crate } = makeWorld();
+    c.setWalk(door, false);
+    c.setWalk(crate, false);
+    grid.applyDirty(c);
+    c.setWalk(door, true);
+    c.remove(crate);
+    grid.applyDirty(c);
+    const [incWalk, incPortals] = snapshot(grid);
+    grid.bake();
+    expect(same(incWalk, grid.walk)).toBe(true);
+    expect(same(incPortals, grid.portalIdx)).toBe(true);
+  });
+
+  it('falls back to a full bake when too many things change at once', () => {
+    const { c, grid } = makeWorld();
+    for (let i = 0; i < 30; i++) c.add(ColliderSet.box(-7 + i * 0.4, 6, 0.3, 0.3, { kind: 'prop' }));
+    const cells = grid.applyDirty(c);
+    expect(cells).toBe(grid.walk.length);
+    expect(grid.applyDirty(c)).toBe(0);
+  });
+});

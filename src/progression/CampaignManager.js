@@ -55,7 +55,7 @@ export class CampaignManager {
     w.economy.set(s.cash);
     w.bounty.set(s.bounty);
     w.property.restore(s.property);
-    w.navDirty = true;
+    w.navDirty = true; // wholesale property restore: a full re-bake is warranted here
     w.waves.start(s.waveIndex);
     return true;
   }

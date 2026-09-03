@@ -29,8 +29,13 @@ export class Enemy {
     this.lastHitBy = null;
     this.knockVx = 0;
     this.knockVz = 0;
-    const gltf = world.assets.instance(def.model);
-    this.rig = new CharacterRig({ look: def.look, height: def.height, width: def.look.width, gltf, clips: world.assets.clips(def.model), weaponId: def.weapon, assets: world.assets });
+    if (opts.rig) {
+      this.rig = opts.rig;
+      this.rig.resetForReuse(def.weapon);
+    } else {
+      const gltf = world.assets.instance(def.model);
+      this.rig = new CharacterRig({ look: def.look, height: def.height, width: def.look.width, gltf, clips: world.assets.clips(def.model), weaponId: def.weapon, assets: world.assets });
+    }
     world.scene.add(this.rig.root);
     this.nav = new EnemyNavigation(this);
     this.combat = new EnemyCombat(this);

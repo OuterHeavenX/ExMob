@@ -91,7 +91,11 @@ export class PropertyManager {
     g.rotation.x = (Math.random() - 0.5) * 0.4;
     g.position.y -= 0.25;
     g.scale.y = 0.7;
-    if (prop.vis.box) { prop.vis.box.walk = prop.vis.box.height > 1.2; prop.vis.box.bullets = false; prop.vis.box.los = false; this.colliders.version++; }
+    if (prop.vis.box) {
+      prop.vis.box.bullets = false;
+      prop.vis.box.los = false;
+      this.colliders.setWalk(prop.vis.box, prop.vis.box.height > 1.2);
+    }
     if (prop.light) {
       this.world.lighting.killLamp(prop.id);
       if (prop.vis.shade) prop.vis.shade.material = this.builder.M.lampOff;
@@ -163,7 +167,11 @@ export class PropertyManager {
     g.rotation.set(0, prop.def.rot || 0, 0);
     g.position.y = this.groundHeight(prop.x, prop.z);
     g.scale.y = 1;
-    if (prop.vis.box) { prop.vis.box.walk = true; prop.vis.box.bullets = prop.vis.box.height >= 1.2; prop.vis.box.los = prop.vis.box.height >= 1.2; this.colliders.version++; }
+    if (prop.vis.box) {
+      prop.vis.box.bullets = prop.vis.box.height >= 1.2;
+      prop.vis.box.los = prop.vis.box.height >= 1.2;
+      this.colliders.setWalk(prop.vis.box, true);
+    }
     if (prop.light) { this.world.lighting.restoreLamp(prop.id, prop.light.intensity); if (prop.vis.shade) prop.vis.shade.material = this.builder.M.lampShade; }
   }
 }
