@@ -50,7 +50,8 @@ Kicks doors if the boss says so. Dies with a surprised expression.
 
 ### Enforcer
 Big. Shotgun. Wants to be inside. Goes straight for the nearest door or window and breaches. The
-player learns to keep distance and to hold a chokepoint.
+player learns to keep distance and to hold a chokepoint. He is the reason melee exists: when he
+reaches the doorway, two swings put him down and knock him off the threshold.
 
 ### Mob Soldier
 SMG. Fires bursts from behind the sedan or a tree, then moves. Teaches the player to use the

@@ -22,6 +22,7 @@ export class InputManager {
     this.kbm = new KeyboardMouseInput(this);
     this.touch = new TouchInput(this);
     this.touch.setVisible(this.mode === 'touch');
+    this._syncBodyClass();
     this.enabled = true;
   }
 
@@ -29,7 +30,13 @@ export class InputManager {
     if (this.mode === mode) return;
     this.mode = mode;
     this.touch.setVisible(mode === 'touch');
+    this._syncBodyClass();
     this.events.emit(EV.INPUT_MODE, { mode });
+  }
+
+  /** Lets the HUD reserve space for the touch buttons (see styles.css, body.touch-mode). */
+  _syncBodyClass() {
+    document.body.classList.toggle('touch-mode', this.mode === 'touch');
   }
 
   /** Called by input sources. */

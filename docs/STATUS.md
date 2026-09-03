@@ -1,6 +1,6 @@
 # EXMOB - STATUS
 
-Honest state of every system as of **v0.2.0** (2026-09-02). Rule 17 of AGENTS.md: nothing here is
+Honest state of every system as of **v0.3.0** (2026-09-03). Rule 17 of AGENTS.md: nothing here is
 marked working unless it was exercised. "Tested" means exercised in the dev browser (Chromium,
 Windows 11, RTX 5080) unless stated otherwise.
 
@@ -20,6 +20,12 @@ Windows 11, RTX 5080) unless stated otherwise.
 - **Player**: WASD movement with collision, mouse aim, precision aim, dodge roll with i-frames,
   health + armor, four weapons with reload (magazine and shell), hitscan with spread, recoil,
   tracers, muzzle flash.
+- **Melee** (F/V, or the MELEE touch button): weapon-butt strike in an arc at close range, with
+  a Blender swing clip, knockback, stagger, prop smashing and a HUD prompt when a target is in
+  reach. Verified by stepping the simulation frame by frame in the browser: a pistol whip deals
+  exactly 45 damage and kills a Street Goon in one swing; an Enforcer takes two; the swing
+  cancels a reload, blocks firing, and is gated by its cooldown; it works with an empty
+  magazine; a target out of reach or behind a closed door is not hit; no gun shot is fired.
 - **Enemies**: Goon, Enforcer, Soldier, Hitman spawn from vehicles and treelines, path on the
   nav grid, breach doors and windows (with visible kicks and shatter), climb through windows,
   engage with line of sight, strafe, seek cover (soldier/hitman), retreat (hitman), flank
@@ -42,7 +48,8 @@ Windows 11, RTX 5080) unless stated otherwise.
 - **Debug**: F3 overlay with FPS, frame/sim/render ms, draw calls, triangles, enemy states,
   particle/decal/debris counts; cheats (god, cash, start/skip wave, kill all, heal, spawn by
   archetype); AI path and nav grid visualization.
-- **Tests**: 39 Vitest unit tests pass (`npm test`). Registry validation passes.
+- **Tests**: 52 Vitest unit tests pass (`npm test`), including melee arc geometry, target
+  selection, melee balance intent, and the save v1 -> v2 migration. Registry validation passes.
 - **Blender pipeline**: headless generator scripts export 47 GLB prototypes with a manifest;
   the runtime loads them (skinned characters with clips, weapons in hand, props, sedan).
 - **Skeletal animation**: all five characters are skinned to a shared skeleton with Idle/Aim/
@@ -107,6 +114,9 @@ Windows 11, RTX 5080) unless stated otherwise.
   A normal Chromium window measured 240 fps at HIGH (uncapped) on the RTX 5080 dev machine.
 - Enemies now back off inside their preferred range, but still bunch up in doorways when
   several arrive together.
+- Melee has no dedicated per-weapon clips: every weapon plays the same `ANM_Melee` swing, so the
+  shotgun buttstroke looks like the pistol whip.
+- Enemies have no melee of their own; an Enforcer who reaches the player still shoots.
 - Shadow map follows the player with a 60 m orthographic frustum; distant shadows are soft.
 - Grass tufts and trees are single-LOD instanced cones; no LOD switching.
 - The vehicle arrival zoom can coincide with a banner; both are brief.
@@ -115,8 +125,8 @@ Windows 11, RTX 5080) unless stated otherwise.
 
 ## NEXT PRIORITIES
 
-1. Human playtest of waves 1-5 on the Pages build (desktop mouse + a phone) and record
-   findings against docs/CABIN_VERTICAL_SLICE.md success criteria.
+1. Human playtest of waves 1-5 on the Pages build (desktop mouse + a phone), now including
+   melee, and record findings against docs/CABIN_VERTICAL_SLICE.md success criteria.
 2. Measure wave 5 (8 active enemies) frame time and draw calls on desktop and a mid-range
    phone; enable automatic quality step-down if needed.
 3. Per-weapon fire/reload clips, dodge clip, window-climb clip; mixer throttling for distant

@@ -8,7 +8,9 @@ first-class target, not a port.
 - Left half of the screen: floating virtual move stick (appears where the thumb lands).
 - Right half: floating virtual aim stick. Pushing past 55% of its radius fires; the stick angle
   is the aim direction. Releasing stops firing.
-- Buttons (right side, above the aim stick): INTERACT, RELOAD, WEAPON (cycle), DODGE.
+- Buttons (right side, above the aim stick): MELEE, INTERACT, RELOAD, WEAPON (cycle), DODGE.
+  MELEE lights up while an enemy is inside its reach, which is how the action is taught on touch
+  (there is no key prompt to read).
 - Top: PAUSE. Between waves: SHOP and READY.
 - Buttons are at least 56 CSS px, with generous hit slop. Layout scales with the `touchScale`
   setting.

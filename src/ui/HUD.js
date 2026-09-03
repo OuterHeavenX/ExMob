@@ -32,9 +32,10 @@ export class HUD {
         el('button', { class: 'btn small primary', text: 'READY', onclick: () => world.waves.ready() }),
       ]),
     ]);
+    this.meleeHint = el('div', { class: 'melee-hint' }, [el('span', { class: 'key', text: 'F' }), el('span', { class: 'lbl', text: 'MELEE' })]);
     this.toasts = el('div', { class: 'toasts' });
     this.el.append(this.vignette, this.hurt, el('div', { class: 'tl' }, [this.health, this.armor]), el('div', { class: 'tr' }, [this.cash, this.bounty, this.waveInfo]),
-      el('div', { class: 'bottom' }, [this.weapon, this.slots]), this.crosshair, this.prompt, this.prep, this.toasts);
+      el('div', { class: 'bottom' }, [this.weapon, this.slots]), this.crosshair, this.prompt, this.meleeHint, this.prep, this.toasts);
     r.appendChild(this.el);
     this._offs = [
       ctx.events.on(EV.PLAYER_HEALTH, (e) => this.setHealth(e.hp, e.max, e.armor)),
@@ -114,6 +115,14 @@ export class HUD {
   }
 
   update(dt) {
+    // melee availability: prompt on desktop, highlighted button on touch
+    const combat = this.world.player.combat;
+    const ready = !!combat.meleeTargetNearby;
+    if (ready !== this._meleeReady) {
+      this._meleeReady = ready;
+      this.meleeHint.classList.toggle('on', ready && this.ctx.input.mode !== 'touch');
+      this.ctx.input.touch.setMeleeReady(ready);
+    }
     const h = this.world.player.health;
     const low = h.lowHealth ? 1 : 0;
     this.vignette.style.opacity = String(low * (0.55 + Math.sin(this.world.time * 5) * 0.15) + (h.hurtT > 0 ? 0.3 : 0));

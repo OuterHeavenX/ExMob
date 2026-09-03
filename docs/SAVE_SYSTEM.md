@@ -8,11 +8,11 @@ Fallback: `localStorage` when IndexedDB is unavailable (private mode, some WebVi
 Export/import produce a JSON blob (with schema version) for backup and device transfer.
 RESET wipes both stores.
 
-## Schema (version 1)
+## Schema (version 2)
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "createdAt": 0,
   "updatedAt": 0,
   "settings": {
@@ -40,7 +40,7 @@ RESET wipes both stores.
     "id": "cabin",
     "upgrades": []
   },
-  "stats": { "kills": 0, "shotsFired": 0, "shotsHit": 0, "cashEarned": 0, "cashSpent": 0, "deaths": 0, "wavesSurvived": 0, "playTime": 0 }
+  "stats": { "kills": 0, "shotsFired": 0, "shotsHit": 0, "meleeHits": 0, "meleeKills": 0, "cashEarned": 0, "cashSpent": 0, "deaths": 0, "wavesSurvived": 0, "playTime": 0 }
 }
 ```
 
@@ -53,7 +53,8 @@ RESET wipes both stores.
 
 ## Migrations
 
-`src/save/migrations.js` exports an ordered array of `{ from, to, migrate(data) }`. `SaveManager`
+`src/save/migrations.js` exports an ordered array of `{ from, to, migrate(data) }`. Shipped
+migrations: 0 -> 1 (pre-release saves without a version), 1 -> 2 (melee statistics). `SaveManager`
 applies every migration from the stored version to `CURRENT_SCHEMA_VERSION` on load, then
 validates. Unknown future versions are refused with a clear message (the game does not
 downgrade). Every schema change must:

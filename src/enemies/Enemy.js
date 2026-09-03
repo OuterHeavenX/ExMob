@@ -27,6 +27,8 @@ export class Enemy {
     this.moveYaw = this.yaw;
     this.opts = opts;
     this.lastHitBy = null;
+    this.knockVx = 0;
+    this.knockVz = 0;
     const gltf = world.assets.instance(def.model);
     this.rig = new CharacterRig({ look: def.look, height: def.height, width: def.look.width, gltf, clips: world.assets.clips(def.model), weaponId: def.weapon, assets: world.assets });
     world.scene.add(this.rig.root);
@@ -49,6 +51,22 @@ export class Enemy {
     this.controller.onHit();
     this.world.events.emit(EV.ENEMY_HIT, { enemy: this, amount, hp: this.hp });
     if (this.hp <= 0) this.die(dx, dz);
+  }
+
+  /** Shove the enemy along (dx,dz) at `speed` m/s; decays over ~0.25 s. Melee and future blasts. */
+  applyKnockback(dx, dz, speed) {
+    const d = Math.hypot(dx, dz) || 1;
+    this.knockVx = (dx / d) * speed;
+    this.knockVz = (dz / d) * speed;
+  }
+
+  _updateKnockback(dt) {
+    if (this.knockVx === 0 && this.knockVz === 0) return;
+    this.moveBy(this.knockVx * dt, this.knockVz * dt);
+    const decay = Math.exp(-12 * dt);
+    this.knockVx *= decay;
+    this.knockVz *= decay;
+    if (Math.hypot(this.knockVx, this.knockVz) < 0.05) { this.knockVx = 0; this.knockVz = 0; }
   }
 
   die(dx = 0, dz = 1) {
@@ -90,6 +108,7 @@ export class Enemy {
   }
 
   update(dt) {
+    this._updateKnockback(dt);
     if (this.dead) { this.deadT += dt; this.rig.update(dt, {}); this.syncVisual(); return; }
     if (this.staggerT > 0) this.staggerT -= dt;
     this.controller.update(dt);

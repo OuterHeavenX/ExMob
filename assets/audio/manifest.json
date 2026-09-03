@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-02T22:28:46.122Z",
+  "generated": "2026-09-03T15:12:59.255Z",
   "sampleRate": 32000,
   "note": "Synthesized placeholders rendered offline. Replace files per id with recorded SFX.",
   "sfx": {
@@ -127,6 +127,17 @@
     ],
     "dodge": [
       "sfx/dodge_1.wav"
+    ],
+    "melee_swing": [
+      "sfx/melee_swing_1.wav",
+      "sfx/melee_swing_2.wav",
+      "sfx/melee_swing_3.wav"
+    ],
+    "melee_hit": [
+      "sfx/melee_hit_1.wav",
+      "sfx/melee_hit_2.wav",
+      "sfx/melee_hit_3.wav",
+      "sfx/melee_hit_4.wav"
     ],
     "enemy_death": [
       "sfx/enemy_death_1.wav",

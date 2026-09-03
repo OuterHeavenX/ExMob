@@ -18,6 +18,8 @@ export const SFX = Object.freeze({
   smg_reload:     { bus: 'PLAYER_WEAPONS', synth: 'reload', steps: 2, gain: 0.5 },
   shotgun_shell:  { bus: 'PLAYER_WEAPONS', synth: 'click', gain: 0.5, pitch: 0.8 },
   shotgun_pump:   { bus: 'PLAYER_WEAPONS', synth: 'pump', gain: 0.6 },
+  melee_swing:    { bus: 'PLAYER_WEAPONS', synth: 'whoosh', gain: 0.7, pitch: 1.2 },
+  melee_hit:      { bus: 'IMPACTS', synth: 'thud', gain: 1.0, pitch: 1.15 },
   impact_wood:    { bus: 'IMPACTS', synth: 'impact', tone: 'wood', gain: 0.5 },
   impact_metal:   { bus: 'IMPACTS', synth: 'impact', tone: 'metal', gain: 0.5 },
   impact_glass:   { bus: 'IMPACTS', synth: 'glass', gain: 0.8 },

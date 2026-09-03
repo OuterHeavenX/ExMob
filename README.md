@@ -58,6 +58,7 @@ npm run blender:build
 | Right mouse (hold) | Precision aim: tighter spread, slower movement |
 | R | Reload |
 | E | Interact (doors, repair, board window) |
+| F or V | Melee: weapon-butt strike at close range |
 | Space | Dodge roll |
 | 1-4 | Weapon slots |
 | Tab | Shop (between waves only) |
@@ -68,8 +69,9 @@ npm run blender:build
 ### Mobile / touch
 
 Left thumb: virtual move stick. Right thumb: virtual aim stick (pushing it past the
-dead zone fires automatically). On-screen buttons: INTERACT, RELOAD, WEAPON, DODGE,
-SHOP/READY, PAUSE. Touch controls are built as a first-class input path, not an overlay.
+dead zone fires automatically). On-screen buttons: MELEE, INTERACT, RELOAD, WEAPON, DODGE,
+SHOP/READY, PAUSE. The MELEE button lights up when someone is inside your reach. Touch
+controls are built as a first-class input path, not an overlay.
 
 Dev mode: add `?dev=1` to the URL to enable the DEBUG menu button and the debug overlay.
 Smoke test harness: `?dev=1&smoke=1` runs the automated smoke sequence and prints results.

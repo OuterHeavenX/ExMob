@@ -30,6 +30,36 @@ Precision aim (hold RMB) halves spread and slows movement to 65%.
 Recoil: camera kick per shot and a visual weapon kick. Muzzle flash spawns a short-lived point
 light (pooled, capped by quality tier).
 
+## Melee
+
+Every weapon can be swung at close range. There is no separate melee weapon and no melee
+ammo: the strike is the weapon butt, so it is always available, including with an empty
+magazine and mid-reload.
+
+| Weapon | Damage | Reach | Arc | Windup | Swing | Cooldown | Knockback | Targets |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Pistol | 45 | 2.0 m | 110 deg | 0.11 s | 0.42 s | 0.70 s | 5.5 m/s | 2 |
+| Revolver | 55 | 2.0 m | 105 deg | 0.12 s | 0.46 s | 0.80 s | 6.5 m/s | 2 |
+| Shotgun | 62 | 2.3 m | 130 deg | 0.14 s | 0.50 s | 0.85 s | 7.5 m/s | 3 |
+| SMG | 36 | 1.9 m | 100 deg | 0.09 s | 0.34 s | 0.55 s | 4.5 m/s | 2 |
+
+Rules:
+
+- The hit lands after the windup, in the aim direction at that moment, so the swing tracks a
+  moving target.
+- Reach is measured to the target's surface, not its center, so wide enemies are easier to hit.
+  Anyone whose body overlaps Ray is hit regardless of angle.
+- Walls block a swing: melee cannot reach through a closed door.
+- Targets are hit nearest first, capped per weapon. A shotgun buttstroke can clip three.
+- Hits knock the target back and stagger them, which interrupts a breach in progress.
+- Destructible props in the arc take the damage multiplied by `propDamageMul` (lamps and
+  chairs go down in one swing).
+- The swing blocks firing, cancels a reload, and halves movement speed until it finishes.
+
+Balance intent: melee is an emergency tool with a real cost, strong enough to reward the player
+who holds their nerve when an Enforcer reaches the doorway. Damage numbers are chosen against
+enemy HP: a pistol whip kills a Street Goon (45 HP) in one, an Enforcer (80 HP) in two.
+
 ## Ammo
 
 Ammo is per weapon (magazine + reserve). Reload is a timed action that can be cancelled by
@@ -50,6 +80,7 @@ lets the player read a threat by its sound.
 ## Feedback checklist per weapon
 
 - fire sound (variation), empty click, reload sequence sounds
+- melee swing whoosh, melee impact (body), melee swing animation clip
 - muzzle flash sprite + light
 - tracer
 - shell ejection (HIGH/ULTRA only)

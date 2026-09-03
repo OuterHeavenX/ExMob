@@ -1,7 +1,7 @@
 /**
  * Global configuration and build metadata. Bump VERSION with package.json (AGENTS.md rule 6).
  */
-export const VERSION = '0.2.0';
+export const VERSION = '0.3.0';
 export const BUILD_NAME = 'CABIN VERTICAL SLICE';
 
 function readFlag(name) {

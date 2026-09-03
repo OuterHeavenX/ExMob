@@ -4,9 +4,10 @@ The only production target. Nothing outside this document is required for the mi
 
 ## What the Cabin must prove
 
-movement, aiming, shooting, enemy AI, navigation, doors, windows, breaching, wave progression,
-preparation phase, money, basic upgrades, damage, VFX, audio architecture, HUD, mobile controls,
-performance, Blender pipeline, asset loading, cinematic presentation.
+movement, aiming, shooting, close-quarters melee, enemy AI, navigation, doors, windows,
+breaching, wave progression, preparation phase, money, basic upgrades, damage, VFX, audio
+architecture, HUD, mobile controls, performance, Blender pipeline, asset loading, cinematic
+presentation.
 
 ## Layout
 

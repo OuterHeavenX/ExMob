@@ -1,10 +1,18 @@
 import * as THREE from 'three';
 import { WeaponState } from '../combat/WeaponSystem.js';
 import { ReloadSystem } from '../combat/ReloadSystem.js';
+import { MeleeSystem } from '../combat/MeleeSystem.js';
 import { WEAPONS, WEAPON_SLOTS } from '../data/weapons/weaponRegistry.js';
 import { EV } from '../core/Events.js';
 
-/** Player weapons: inventory of WeaponState, equip, fire, reload, ammo purchases. */
+/**
+ * Player weapons: inventory of WeaponState, equip, fire, reload, ammo purchases, and the
+ * close-quarters melee strike (docs/WEAPONS.md, Melee).
+ *
+ * Melee timing: pressing melee starts a swing of `duration` seconds; the hit resolves after
+ * `windup` and the action is unavailable again until `cooldown` elapses. A swing cancels a
+ * reload and blocks firing, so it is a real trade, not a free extra button.
+ */
 export class PlayerCombat {
   constructor(player) {
     this.p = player;
@@ -12,13 +20,22 @@ export class PlayerCombat {
     for (const id of WEAPON_SLOTS) this.weapons[id] = new WeaponState(id, { owned: WEAPONS[id].owned });
     this.equipped = 'pistol';
     this.reload = new ReloadSystem(player.world.ctx.audio, player.world.events);
+    this.meleeSystem = new MeleeSystem(player.world);
     this.now = 0;
     this._muzzle = new THREE.Vector3();
     this.swapT = 0;
+    this.meleeT = 0;
+    this.meleeHitAt = 0;
+    this.meleeCooldown = 0;
+    this.meleeStruck = false;
+    this.meleeTargetNearby = false;
   }
 
   get current() { return this.weapons[this.equipped]; }
   get events() { return this.p.world.events; }
+  /** True while a swing is in progress (movement slows, firing is blocked). */
+  get swinging() { return this.meleeT > 0; }
+  get meleeDef() { return this.current.def.melee; }
 
   ownedIds() { return WEAPON_SLOTS.filter((id) => this.weapons[id].owned); }
 
@@ -63,16 +80,48 @@ export class PlayerCombat {
 
   startReload() {
     const w = this.current;
+    if (this.swinging) return;
     if (this.reload.start(w, { x: this.p.x, z: this.p.z })) { this.p.rig.reload?.(); this.events.emit(EV.PLAYER_RELOAD, { id: w.id, time: w.def.reloadTime }); this.emitAmmo(); }
+  }
+
+  /** Begin a melee swing. Returns false when dead, busy, cooling down, or mid-dodge. */
+  tryMelee() {
+    const p = this.p;
+    if (p.health.dead || p.world.cinematicActive || p.movement.dodging) return false;
+    if (this.meleeT > 0 || this.meleeCooldown > 0) return false;
+    const def = this.meleeDef;
+    this.meleeT = def.duration;
+    this.meleeHitAt = def.duration - def.windup;
+    this.meleeCooldown = def.cooldown;
+    this.meleeStruck = false;
+    this.reload.cancel(this.current);
+    this.emitAmmo();
+    p.rig.melee();
+    p.world.ctx.audio.play(def.sfx, { pitch: 0.95 + Math.random() * 0.12 });
+    this.events.emit(EV.PLAYER_MELEE, { weapon: this.equipped, x: p.x, z: p.z });
+    return true;
+  }
+
+  _meleeStrike(aim) {
+    const p = this.p;
+    const res = this.meleeSystem.strike({ x: p.x, z: p.z }, aim, this.meleeDef);
+    if (!res.enemyHits && !res.propHits) p.world.ctx.audio.play('melee_swing', { gain: 0.5, pitch: 1.35 });
   }
 
   /** trigger: held state; precision: bool; aim dir {x,z}. */
   update(dt, trigger, precision, aim) {
     this.now += dt;
     if (this.swapT > 0) this.swapT -= dt;
+    if (this.meleeCooldown > 0) this.meleeCooldown -= dt;
+    if (this.meleeT > 0) {
+      this.meleeT = Math.max(0, this.meleeT - dt);
+      if (!this.meleeStruck && this.meleeT <= this.meleeHitAt) { this.meleeStruck = true; this._meleeStrike(aim); }
+    }
+    this.meleeSystem.update(dt);
+
     const w = this.current;
     if (this.reload.update(w, dt, { x: this.p.x, z: this.p.z })) this.emitAmmo();
-    const canFire = !this.p.health.dead && this.swapT <= 0 && !this.p.world.cinematicActive && !this.p.movement.dodging;
+    const canFire = !this.p.health.dead && this.swapT <= 0 && !this.swinging && !this.p.world.cinematicActive && !this.p.movement.dodging;
     if (canFire && w.canFire(this.now, trigger)) {
       this._fire(w, precision, aim);
     } else if (trigger && !w.triggerWasDown && w.mag === 0 && !w.reloading && canFire) {
@@ -80,6 +129,10 @@ export class PlayerCombat {
       if (w.reserve > 0) this.startReload();
     }
     w.triggerWasDown = trigger;
+
+    // HUD / touch hint: is a swing available and would it connect right now?
+    this.meleeTargetNearby = !this.p.health.dead && this.meleeCooldown <= 0 && this.meleeT <= 0
+      && this.meleeSystem.hasTarget(this.p.x, this.p.z, aim.x, aim.z, this.meleeDef);
   }
 
   _fire(w, precision, aim) {

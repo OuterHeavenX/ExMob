@@ -37,6 +37,11 @@ export class TouchInput {
     this.buttons.ready.hidden = phase !== 'prep';
   }
 
+  /** Highlight MELEE while something is in reach so the action is discoverable on touch. */
+  setMeleeReady(v) {
+    if (this.buttons.melee) this.buttons.melee.classList.toggle('ready', !!v);
+  }
+
   _makeStick(id) {
     const base = el('div', { class: 'stick-base', id: `stick-${id}` }, [el('div', { class: 'stick-knob' })]);
     base.style.display = 'none';
@@ -46,7 +51,8 @@ export class TouchInput {
 
   _buildButtons() {
     const defs = [
-      ['interact', 'E', 'INTERACT'], ['reload', 'R', 'RELOAD'], ['weaponCycle', 'Q', 'WEAPON'], ['dodge', '⤳', 'DODGE'],
+      ['melee', '✊', 'MELEE'], ['interact', 'E', 'INTERACT'], ['reload', 'R', 'RELOAD'],
+      ['weaponCycle', 'Q', 'WEAPON'], ['dodge', '⤳', 'DODGE'],
       ['shop', '$', 'SHOP'], ['ready', '▶', 'READY'], ['pause', 'II', 'PAUSE'],
     ];
     const cluster = el('div', { class: 'touch-buttons' });

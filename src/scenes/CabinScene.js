@@ -52,7 +52,7 @@ export class CabinScene {
       ctx, events, scene, lighting, wallFader, builder, assets: ctx.assets,
       colliders: builder.colliders, difficulty: ctx.difficulty, paused: false, cinematicActive: false,
       pathBudget: 0, navDirty: false, ui: ctx.ui, time: 0,
-      stats: { kills: 0, shotsFired: 0, shotsHit: 0, cashEarned: 0, cashSpent: 0, deaths: 0, wavesSurvived: 0, playTime: 0 },
+      stats: { kills: 0, shotsFired: 0, shotsHit: 0, meleeHits: 0, meleeKills: 0, cashEarned: 0, cashSpent: 0, deaths: 0, wavesSurvived: 0, playTime: 0 },
     };
     world.vfx = new VFXManager(scene, ctx.quality, lighting);
     world.property = new PropertyManager(CABIN, builder, ctx, world);

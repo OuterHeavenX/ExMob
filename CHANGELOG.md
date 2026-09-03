@@ -2,6 +2,28 @@
 
 All notable changes to EXMOB are documented here. The project uses semantic versioning.
 
+## [0.3.0] - 2026-09-03
+
+Playtest feedback: enemies that reach you need an answer that is not the gun.
+
+### Added
+- **Melee strike** (F or V on desktop, MELEE button on touch): a weapon-butt swing in a wide arc
+  at close range, available with any weapon including an empty one. Weapon-flavored damage,
+  reach, arc, cooldown and knockback live in each weapon's `melee` registry block
+  (docs/WEAPONS.md). Hits knock enemies back, stagger them (interrupting a breach), and smash
+  destructible props in the arc.
+- Knockback on enemies, resolved through normal collision so nothing is shoved through a wall.
+- `ANM_Melee` Blender clip on every character, plus a procedural swing for the rigid-part
+  fallback rig.
+- Baked `melee_swing` and `melee_hit` sound effects (7 new sample files).
+- HUD melee prompt near the crosshair and a highlighted MELEE button on touch when a target is
+  in reach.
+- Save schema v2 with a 1 -> 2 migration adding melee statistics, covered by a unit test.
+
+### Changed
+- A swing cancels a reload in progress, blocks firing, and halves movement speed until it ends.
+- `F` is no longer an alias for interact (E remains interact).
+
 ## [0.2.0] - 2026-09-02
 
 Priority pass after the first vertical slice.

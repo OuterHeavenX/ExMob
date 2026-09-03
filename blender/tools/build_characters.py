@@ -10,7 +10,8 @@ The body is ONE skinned mesh (rigid weights per part, one material per part fami
 character costs one primitive per material at runtime.
 
 Clips are authored as keyframed poses and exported as NLA tracks named ANM_* :
-  ANM_Idle, ANM_Walk, ANM_Run, ANM_Aim, ANM_Fire, ANM_Reload, ANM_Hit, ANM_Death, ANM_Kick.
+  ANM_Idle, ANM_Walk, ANM_Run, ANM_Aim, ANM_Fire, ANM_Reload, ANM_Hit, ANM_Death, ANM_Kick,
+  ANM_Melee.
 Forward is -Y in Blender (+Z in glTF). The right hand bone (hand_R) is the weapon socket.
 See docs/BLENDER_PIPELINE.md.
 """
@@ -276,6 +277,14 @@ def author_clips(arm):
         (16, {'root': (fb * 84, 0, 0), 'spine': (-6, 0, 0), 'head': (-10, 0, 0), 'arm_R': (af * -20, 0, 30), 'arm_L': (af * -10, 0, -30), 'leg_L': (lf * 8, 0, 0), 'leg_R': (-lf * 5, 0, 0)}, {'root': (0, 0, 0.05)}),
         (26, {'root': (fb * 86, 0, 0), 'spine': (-6, 0, 0), 'head': (-10, 0, 0), 'arm_R': (af * -20, 0, 35), 'arm_L': (af * -10, 0, -35), 'leg_L': (lf * 8, 0, 0), 'leg_R': (-lf * 5, 0, 0)}, {'root': (0, 0, 0.05)}),
     ], 26)
+    # Melee: weapon-butt swing across the body, hips and shoulders drive it
+    A.clip('ANM_Melee', [
+        (1, pose(), None),
+        (3, pose({'arm_R': (af * 38, 0, -55), 'spine': (2, 0, -16), 'head': (0, 0, -9), 'arm_L': (af * 62, 0, -8)}), None),
+        (7, pose({'arm_R': (af * 100, 0, 62), 'spine': (-2, 0, 21), 'head': (0, 0, 11), 'arm_L': (af * 44, 0, 16)}), None),
+        (11, pose({'arm_R': (af * 88, 0, 30), 'spine': (0, 0, 8)}), None),
+        (18, pose(), None),
+    ], 18)
     # Kick (door breach): right leg drives forward
     A.clip('ANM_Kick', [
         (1, pose(), None),

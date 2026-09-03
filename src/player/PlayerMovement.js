@@ -44,7 +44,8 @@ export class PlayerMovement {
       if (this.dodgeT <= this.dodge.duration - this.dodge.invulnerable) p.health.invulnerable = false;
       if (this.dodgeT <= 0) p.health.invulnerable = false;
     } else {
-      const sp = this.speed * (precision ? this.precisionMul : 1) * (p.health.dead ? 0 : 1);
+      const swinging = p.combat && p.combat.swinging;
+      const sp = this.speed * (precision ? this.precisionMul : 1) * (swinging ? 0.5 : 1) * (p.health.dead ? 0 : 1);
       tx = moveX * sp; tz = moveZ * sp;
     }
     const lambda = this.dodgeT > 0 ? 30 : 14;

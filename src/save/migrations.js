@@ -26,6 +26,17 @@ export const MIGRATIONS = [
       return d;
     },
   },
+  {
+    // v0.3.0 added the melee strike; track its statistics alongside the shooting ones.
+    from: 1, to: 2,
+    migrate(data) {
+      const d = { ...data };
+      d.stats = d.stats || {};
+      if (typeof d.stats.meleeHits !== 'number') d.stats.meleeHits = 0;
+      if (typeof d.stats.meleeKills !== 'number') d.stats.meleeKills = 0;
+      return d;
+    },
+  },
 ];
 
 /**

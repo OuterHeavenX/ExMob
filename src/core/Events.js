@@ -29,6 +29,7 @@ export const EV = Object.freeze({
   PLAYER_WEAPON: 'player:weapon',
   PLAYER_AMMO: 'player:ammo',
   PLAYER_DODGE: 'player:dodge',
+  PLAYER_MELEE: 'player:melee',
   PLAYER_INSIDE: 'player:inside',
   // property
   PORTAL_STATE: 'portal:state',

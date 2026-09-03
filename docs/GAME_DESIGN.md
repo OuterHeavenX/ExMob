@@ -69,6 +69,8 @@ See README.md for the full mapping. Design intent:
 - Firing is immediate and responsive; there is no wind-up.
 - Precision aim (right mouse / hold) tightens spread and slows movement. It is optional.
 - Dodge is a short invulnerable roll with a cooldown; it is an escape tool, not a spam tool.
+- Melee (F or V) is the answer to someone who gets inside your gun. It is a weapon-butt strike
+  in a wide arc, not a separate melee weapon: whatever is in Ray's hands is what hits them.
 - Interaction (E) is context sensitive: open/close doors, repair, board windows, pick up.
 - Mobile uses dual virtual sticks with fire-on-aim, plus context buttons. It is a first-class
   path designed alongside desktop, not an afterthought.
@@ -82,6 +84,13 @@ weapon audio, tracer, impact effect that matches the surface (wood chips, sparks
 dust), hit reaction on enemies, camera impulse. Enemies stagger when hit and die with weight.
 
 Shooting must feel satisfying with the starting pistol, before any progression exists.
+
+**Close quarters.** Guns are the game, but a shotgun Enforcer who reaches the doorway must have
+an answer that is not "walk backwards". The melee strike is that answer: fast, heavy, and
+weapon-flavored. It knocks the target back and staggers them, so it buys the half-second needed
+to reload or retreat. It costs something in return: the swing blocks firing, cancels a reload in
+progress, slows movement, and has a cooldown. It is a trade, not a free button. A pistol whip
+kills a Street Goon outright; it takes two to put down an Enforcer, who will hurt you first.
 
 ## The property is a character
 

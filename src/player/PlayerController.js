@@ -42,6 +42,7 @@ export class PlayerController {
         const len = Math.hypot(mx, mz);
         this.aim.x = mx / len; this.aim.z = mz / len;
       }
+      if (input.pressed('melee')) p.combat.tryMelee();
       if (input.pressed('dodge')) p.movement.tryDodge(mx, mz);
       if (input.pressed('reload')) p.combat.startReload();
       if (input.pressed('weaponCycle')) p.combat.cycle();

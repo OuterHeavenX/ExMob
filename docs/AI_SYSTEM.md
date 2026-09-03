@@ -64,6 +64,13 @@ An enemy in BREACH applies `breachDamage` every `breachInterval` to the portal v
 When a portal breaks the enemy transitions to ENTER_BUILDING. Portal breaks emit events for VFX
 and HUD ("BACK DOOR BREACHED").
 
+## Knockback
+
+Melee hits (and, later, blasts) push an enemy along the hit direction with a velocity that decays
+over about a quarter second. Knockback runs through the same collision resolution as normal
+movement, so a shoved enemy cannot be pushed through a wall, and it applies to dead bodies for a
+moment so they fall away with weight. Combined with the stagger it interrupts a breach.
+
 ## Combat
 
 `EnemyCombat` handles reaction time, burst fire, cooldowns, accuracy vs range and vs target

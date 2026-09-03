@@ -214,6 +214,22 @@ function whoosh() {
   t.noise(0.35, [['bp', 900, 0.6]], 0.05, 0.25);
   return t.finish(0.5);
 }
+function meleeSwing() {
+  const t = new Track(0.35);
+  t.noise(0.5, [['bp', rr(950, 1250), 0.5]], 0.02, 0.18);
+  t.noise(0.22, [['hp', 2500, 0.7]], 0.01, 0.08, 0.02);
+  t.tone(0.12, 220, 90, 0.02, 0.14, 'tri');
+  return t.finish(0.6);
+}
+function meleeHit() {
+  const t = new Track(0.6);
+  t.tone(1.0, rr(120, 145), 45, 0.001, 0.16);                  // body
+  t.noise(0.8, [['lp', 700, 0.8]], 0.0005, 0.12, 0, null, 2);  // meat
+  t.noise(0.6, [['bp', rr(1800, 2300), 4]], 0.0005, 0.05, 0.004); // crack
+  t.tone(0.3, 320, 120, 0.001, 0.09, 'tri', 0.004);
+  t.reverb(0.18, 0.28);
+  return t.finish(0.95);
+}
 function grunt() {
   const t = new Track(0.35);
   t.tone(0.15, rr(150, 210), 70, 0.01, 0.2, 'saw');
@@ -254,6 +270,8 @@ const RECIPES = {
   player_hurt: [3, () => impact({ tone: 'flesh', pitch: 0.8 })],
   heartbeat: [1, () => heartbeat()],
   dodge: [1, () => whoosh()],
+  melee_swing: [3, () => meleeSwing()],
+  melee_hit: [4, () => meleeHit()],
   enemy_death: [4, () => grunt()],
 };
 

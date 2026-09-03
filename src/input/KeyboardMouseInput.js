@@ -4,7 +4,8 @@
  */
 const KEYMAP = {
   KeyR: 'reload', KeyE: 'interact', Space: 'dodge', Digit1: 'slot0', Digit2: 'slot1', Digit3: 'slot2', Digit4: 'slot3',
-  Tab: 'shop', KeyB: 'shop', Enter: 'ready', Escape: 'pause', F3: 'debug', KeyQ: 'weaponCycle', KeyF: 'interact',
+  Tab: 'shop', KeyB: 'shop', Enter: 'ready', Escape: 'pause', F3: 'debug', KeyQ: 'weaponCycle',
+  KeyF: 'melee', KeyV: 'melee',
 };
 
 export class KeyboardMouseInput {

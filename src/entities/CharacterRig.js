@@ -7,7 +7,7 @@ import { batchPivotChildren, batchGroup } from '../world/Batch.js';
 /**
  * Character visual + animation. Three sources, one interface:
  *  1. SKELETAL: a GLB with a skinned mesh and ANM_* clips (Blender rig, docs/BLENDER_PIPELINE.md).
- *     Locomotion clips are blended by speed; Fire/Reload/Hit/Kick/Death are one-shots.
+ *     Locomotion clips are blended by speed; Fire/Reload/Hit/Kick/Melee/Death are one-shots.
  *  2. RIGID GLB: named part pivots (Head/Torso/ArmL/...) driven procedurally (ADR-010 fallback).
  *  3. PROCEDURAL: boxes built from a `look` descriptor when no asset exists.
  * Interface used by gameplay: root, body, setWeapon, muzzleWorld, kick, hit, breach, reload, die, update.
@@ -29,6 +29,7 @@ export class CharacterRig {
     this.dead = false;
     this.deathT = 0;
     this.deathYaw = 0;
+    this.swingT = 0;
     this.assets = assets;
     this.skeletal = false;
     let skinned = false;
@@ -61,7 +62,7 @@ export class CharacterRig {
       a.setEffectiveWeight(k === 'idle' ? 1 : 0);
       a.play();
     }
-    for (const k of ['fire', 'reload', 'hit', 'kick', 'death']) {
+    for (const k of ['fire', 'reload', 'hit', 'kick', 'melee', 'death']) {
       const a = this.actions[k];
       if (!a) continue;
       a.setLoop(THREE.LoopOnce, 1);
@@ -199,6 +200,12 @@ export class CharacterRig {
 
   reload() { if (this.skeletal) this._oneShot('reload', 1, 0.08); }
 
+  /** Weapon-butt swing. Skeletal clip when available, procedural arm swing otherwise. */
+  melee() {
+    if (this.skeletal && this._oneShot('melee', 1.5, 0.02)) return;
+    this.swingT = 0.34;
+  }
+
   die(dirX, dirZ) {
     this.dead = true;
     this.deathT = 0;
@@ -206,7 +213,7 @@ export class CharacterRig {
     if (this.skeletal) {
       // the clip falls backward from the feet: face the shooter so the body falls away from the shot
       this.body.rotation.y = Math.atan2(-dirX, -dirZ);
-      for (const k of ['idle', 'walk', 'run', 'fire', 'reload', 'hit', 'kick']) if (this.actions[k]) this.actions[k].fadeOut(0.08);
+      for (const k of ['idle', 'walk', 'run', 'fire', 'reload', 'hit', 'kick', 'melee']) if (this.actions[k]) this.actions[k].fadeOut(0.08);
       this._oneShot('death', 1, 0.05);
     }
   }
@@ -241,10 +248,12 @@ export class CharacterRig {
     this.body.position.y = Math.abs(Math.sin(this.walkPhase)) * 0.035 * this.speedNorm;
     this.recoil = damp(this.recoil, 0, 14, dt);
     this.flinch = damp(this.flinch, 0, 8, dt);
+    if (this.swingT > 0) this.swingT = Math.max(0, this.swingT - dt);
+    const swingP = this.swingT > 0 ? Math.sin((1 - this.swingT / 0.34) * Math.PI) : 0;
     const aimPitch = aiming ? -Math.PI / 2 + 0.15 : -0.2;
     if (P.ArmR) {
-      P.ArmR.rotation.x = aimPitch + this.recoil * 0.45 - this.flinch * 0.3;
-      P.ArmR.rotation.z = aiming ? 0.05 : 0.1 - swing * 0.5;
+      P.ArmR.rotation.x = aimPitch + this.recoil * 0.45 - this.flinch * 0.3 + swingP * 0.9;
+      P.ArmR.rotation.z = (aiming ? 0.05 : 0.1 - swing * 0.5) - swingP * 1.25;
       P.ArmR.rotation.y = aiming ? -0.12 : 0;
     }
     if (P.ArmL) {
@@ -253,7 +262,7 @@ export class CharacterRig {
       P.ArmL.rotation.z = aiming && twoHanded ? -0.35 : -0.08;
       P.ArmL.rotation.y = aiming && twoHanded ? 0.35 : 0;
     }
-    if (P.Torso) { P.Torso.rotation.x = -this.recoil * 0.06 + this.flinch * 0.12; P.Torso.rotation.z = this.flinch * 0.08; }
+    if (P.Torso) { P.Torso.rotation.x = -this.recoil * 0.06 + this.flinch * 0.12; P.Torso.rotation.z = this.flinch * 0.08 + swingP * 0.3; }
     if (P.Head) P.Head.rotation.x = this.flinch * 0.3;
   }
 

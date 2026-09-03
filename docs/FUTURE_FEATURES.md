@@ -4,7 +4,8 @@ Good ideas, deliberately postponed. Nothing here is required for the Cabin. Add 
 rather than implementing early.
 
 ## Gameplay
-- Melee finisher when an enemy is within 1 m and the magazine is empty.
+- Melee variations: a grab/shove, a finisher on a staggered enemy, enemy melee for the Enforcer.
+  (The base melee strike shipped in v0.3.0; see docs/WEAPONS.md.)
 - Throwable: improvised (bottle) to break a window on purpose / distract.
 - Guard dog with a zone and a single stun.
 - Hired muscle AI defender with a simple follow/hold command.

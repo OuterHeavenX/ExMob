@@ -34,6 +34,20 @@ describe('save schema', () => {
     expect(validateSave(out)).toEqual([]);
   });
 
+  it('migrates a v1 save to v2 by adding melee statistics', () => {
+    const v1 = createDefaultSave();
+    v1.schemaVersion = 1;
+    delete v1.stats.meleeHits;
+    delete v1.stats.meleeKills;
+    v1.stats.kills = 7;
+    const out = applyMigrations(v1);
+    expect(out.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+    expect(out.stats.meleeHits).toBe(0);
+    expect(out.stats.meleeKills).toBe(0);
+    expect(out.stats.kills).toBe(7);
+    expect(validateSave(out)).toEqual([]);
+  });
+
   it('refuses saves from the future', () => {
     expect(() => applyMigrations({ schemaVersion: CURRENT_SCHEMA_VERSION + 1 })).toThrow();
   });

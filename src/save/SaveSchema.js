@@ -2,7 +2,7 @@ import { ECONOMY } from '../data/economy/economyRegistry.js';
 import { WEAPONS } from '../data/weapons/weaponRegistry.js';
 
 /** Save schema. Bump CURRENT_SCHEMA_VERSION with a migration + test. See docs/SAVE_SYSTEM.md. */
-export const CURRENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 2;
 
 export function createDefaultSettings() {
   return {
@@ -33,7 +33,7 @@ export function createDefaultSave(now = Date.now()) {
       unlockedDefenses: ['boards', 'door_repair'],
     },
     property: { id: 'cabin', upgrades: [] },
-    stats: { kills: 0, shotsFired: 0, shotsHit: 0, cashEarned: 0, cashSpent: 0, deaths: 0, wavesSurvived: 0, playTime: 0 },
+    stats: { kills: 0, shotsFired: 0, shotsHit: 0, meleeHits: 0, meleeKills: 0, cashEarned: 0, cashSpent: 0, deaths: 0, wavesSurvived: 0, playTime: 0 },
   };
 }
 

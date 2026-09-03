@@ -40,6 +40,16 @@ export function validateRegistries() {
     if (w.falloffStart > w.maxRange) push(`weapon ${key}: falloffStart > maxRange`);
     if (w.reserveStart > w.reserveMax) push(`weapon ${key}: reserveStart > reserveMax`);
     for (const s of ['fire', 'reload', 'empty']) if (!SFX[w.sfx[s]]) push(`weapon ${key}: missing sfx ${w.sfx[s]}`);
+    const m = w.melee;
+    if (!m) push(`weapon ${key}: missing melee block`);
+    else {
+      for (const f of ['damage', 'range', 'arcDeg', 'windup', 'duration', 'cooldown', 'knockback', 'stagger', 'maxTargets'])
+        if (typeof m[f] !== 'number' || m[f] <= 0) push(`weapon ${key}: bad melee.${f}`);
+      if (m.arcDeg > 180) push(`weapon ${key}: melee.arcDeg must be <= 180`);
+      if (m.windup >= m.duration) push(`weapon ${key}: melee.windup must be shorter than duration`);
+      if (m.cooldown < m.duration) push(`weapon ${key}: melee.cooldown must cover the swing`);
+      if (!SFX[m.sfx]) push(`weapon ${key}: missing melee sfx ${m.sfx}`);
+    }
   }
   for (const id of WEAPON_SLOTS) if (!WEAPONS[id]) push(`slot references unknown weapon ${id}`);
 
@@ -107,6 +117,7 @@ export function validateRegistries() {
   for (const [key, d] of Object.entries(DIFFICULTY)) if (d.id !== key) push(`difficulty ${key}: id mismatch`);
   if (!DIFFICULTY.normal) push('difficulty normal missing');
   for (const [key, s] of Object.entries(SFX)) if (!AUDIO_BUSES.includes(s.bus)) push(`sfx ${key}: unknown bus ${s.bus}`);
+  if (!SFX.melee_hit) push('sfx melee_hit missing');
   for (const [key, s] of Object.entries(SURFACE_VFX)) {
     if (!VFX[s.vfx]) push(`surface ${key}: unknown vfx ${s.vfx}`);
     if (!SFX[s.sfx]) push(`surface ${key}: unknown sfx ${s.sfx}`);
