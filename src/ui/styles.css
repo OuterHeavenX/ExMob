@@ -165,9 +165,8 @@ button { font-family: var(--font-display); letter-spacing: 0.12em; text-transfor
 
 /* touch controls */
 .touch-layer { position: fixed; inset: 0; z-index: 12; display: none; touch-action: none; }
-.touch-layer.active { display: block; }
-body.in-game .touch-layer.active { pointer-events: auto; }
-body:not(.in-game) .touch-layer.active { pointer-events: none; }
+/* gameplay controls only: the title, pause and shop screens must not have buttons floating on them */
+body.in-game .touch-layer.active { display: block; pointer-events: auto; }
 .stick-base { position: absolute; width: calc(120px * var(--touch-scale)); height: calc(120px * var(--touch-scale)); margin-left: calc(-60px * var(--touch-scale)); margin-top: calc(-60px * var(--touch-scale)); border-radius: 50%; border: 2px solid rgba(236,228,210,0.35); background: rgba(0,0,0,0.25); pointer-events: none; }
 .stick-knob { position: absolute; left: 50%; top: 50%; width: calc(52px * var(--touch-scale)); height: calc(52px * var(--touch-scale)); border-radius: 50%; background: rgba(236,228,210,0.75); transform: translate(-50%, -50%); }
 #stick-aim .stick-knob { background: rgba(232,169,74,0.8); }
@@ -192,6 +191,13 @@ body.touch-mode .hud .tr { right: calc(72px + var(--safe-r)); }
   .title-logo { font-size: 18vw; }
 }
 @media (max-height: 460px) {
+  .title-screen { grid-template-rows: auto auto 1fr; }
+  .title-logo { font-size: clamp(40px, 9vw, 86px); }
+  .title-eyebrow { font-size: 10px; }
+  .title-tag { font-size: 10px; line-height: 1.5; margin-top: 4px; }
+  .menu { margin-top: 10px; gap: 0; }
+  .menu-btn { font-size: clamp(15px, 2.2vw, 20px); padding: 6px 0 6px 14px; }
+  .title-hint { font-size: 9px; }
   .touch-buttons { bottom: calc(96px + var(--safe-b)); gap: 8px; }
   .touch-btn { width: calc(52px * var(--touch-scale)); height: calc(52px * var(--touch-scale)); }
   .touch-btn .glyph { font-size: 15px; }
