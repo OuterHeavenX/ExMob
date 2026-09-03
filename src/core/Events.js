@@ -38,7 +38,16 @@ export const EV = Object.freeze({
   PROP_HIT: 'prop:hit',
   PROP_DESTROYED: 'prop:destroyed',
   PROP_REPAIRED: 'prop:repaired',
+  BARRICADE_PLACED: 'portal:barricadePlaced',
+  BARRICADE_BROKEN: 'portal:barricadeBroken',
   INTERACT_PROMPT: 'interact:prompt',
+  // hazards / defenses
+  FIRE_STARTED: 'hazard:fireStarted',
+  FIRE_OUT: 'hazard:fireOut',
+  DEFENSE_INSTALLED: 'defense:installed',
+  DEFENSE_LOST: 'defense:lost',
+  ENEMY_MELEE: 'enemy:melee',
+  SNIPER_AIM: 'enemy:sniperAim',
   // economy
   CASH_CHANGED: 'cash:changed',
   CASH_PICKUP: 'cash:pickup',

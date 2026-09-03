@@ -29,6 +29,7 @@ export class Enemy {
     this.lastHitBy = null;
     this.knockVx = 0;
     this.knockVz = 0;
+    this.throwCd = 1.5 + Math.random() * 2; // arsonists do not all throw on the same frame
     if (opts.rig) {
       this.rig = opts.rig;
       this.rig.resetForReuse(def.weapon);
@@ -81,6 +82,7 @@ export class Enemy {
     this.rig.die(dx, dz);
     this.controller.set('DEAD');
     this.world.cover.release(this);
+    if (this.world.lasers) this.world.lasers.clear(this);
     this.world.ctx.audio.play('enemy_death', { x: this.x, z: this.z });
     this.world.events.emit(EV.ENEMY_DEATH, { enemy: this, x: this.x, z: this.z, def: this.def });
   }
@@ -116,10 +118,24 @@ export class Enemy {
     this._updateKnockback(dt);
     if (this.dead) { this.deadT += dt; this.rig.update(dt, {}); this.syncVisual(); return; }
     if (this.staggerT > 0) this.staggerT -= dt;
+    if (this.throwCd > 0) this.throwCd -= dt;
+    this._avoidFire(dt);
     this.controller.update(dt);
     this.combat.update(dt);
     this.syncVisual();
     this.rig.update(dt, { speedNorm: this.speedNorm, moveYaw: this.moveYaw, aimYaw: this.yaw, aiming: this.combat.aiming });
+  }
+
+  /**
+   * Walk out of a burning pool. Fire is deliberately kept out of the navigation grid (a re-bake
+   * per bottle would be a frame spike), so avoidance is a steering force instead.
+   */
+  _avoidFire(dt) {
+    const fires = this.world.fires;
+    if (!fires || !fires.count) return;
+    const r = fires.repulsion(this.x, this.z);
+    if (r.x === 0 && r.z === 0) return;
+    this.moveBy(r.x * dt, r.z * dt);
   }
 
   syncVisual() {

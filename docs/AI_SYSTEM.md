@@ -45,6 +45,14 @@ are special cells with a portal id. `AStar` finds paths; closed portals cost ext
 traversable in planning, so enemies naturally choose the nearest entry and breach it. Windows are
 only traversable for archetypes with `canEnterWindows`.
 
+Specialist states (v0.6.0): MELEE for gunless attackers, SNIPE and REPOSITION for the rifleman,
+THROW for the arsonist. Each is entered from APPROACH or ENGAGE when the profile carries the
+matching block, so a new archetype is a registry entry plus at most one state.
+
+Fire is deliberately absent from the navigation grid. A molotov would otherwise dirty the cells it
+covers and re-bake them every time one landed; instead `FireSystem.repulsion` returns a steering
+push and enemies walk out of a pool in about a second. It costs nothing and cannot spike a frame.
+
 Baking the grid over the whole property costs about 67 ms, so it happens once at load. After
 that, collider changes (a door opening, a prop destroyed, a car parking) record a dirty rectangle
 and only those cells are re-baked, which costs well under a millisecond. `NavGrid.applyDirty` is

@@ -21,9 +21,9 @@ export class ShopUI {
   render() {
     const w = this.world, shop = w.shop;
     this.el.innerHTML = '';
-    const cats = { supplies: 'SUPPLIES', weapons: 'WEAPONS' };
+    const cats = { supplies: 'SUPPLIES', weapons: 'WEAPONS', defenses: 'THE PROPERTY' };
     this.el.append(el('div', { class: 'shop-head' }, [el('div', { class: 'big', text: 'THE TRUNK' }), el('div', { class: 'cash', text: formatCash(w.economy.cash) })]));
-    this.el.append(el('div', { class: 'body dim', text: 'Doors and windows are repaired in the world: walk up and hold INTERACT.' }));
+    this.el.append(el('div', { class: 'body dim', text: 'Doors, boards and barricades are bought in the world: walk up and hold INTERACT.' }));
     for (const [cat, label] of Object.entries(cats)) {
       const list = el('div', { class: 'shop-list' });
       for (const item of shop.items.filter((i) => i.category === cat)) {

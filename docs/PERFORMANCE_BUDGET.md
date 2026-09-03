@@ -54,6 +54,9 @@ separately from the steady-state costs above.
 | All active enemies re-planning at once | 8 ms | 3.8 ms (8 enemies) |
 | Enemy spawn | 4 ms | 1.4 ms recycled rig, 2.9 ms cold |
 | Worst frame over a full wave | 8 ms | 5.6 ms |
+| Worst frame over a full wave 5, all archetypes (v0.6.0) | 8 ms | 4.2 ms |
+| Barricade raised or destroyed | 2 ms | 0.7 ms (48 nav cells) |
+| Molotov lands and a fire pool lights | 2 ms | under 0.1 ms (no nav work at all) |
 
 Rules that keep it there:
 
@@ -66,6 +69,23 @@ Rules that keep it there:
   debris, tracers, cash pickups.
 - The debug overlay's worst-frame and long-frame counters are the check. Reset them, play a wave,
   and read them back.
+- Runtime hazards stay out of the navigation grid. Fire pushes AI with a steering force rather
+  than making cells unwalkable, so a thrown bottle costs nothing to path around.
+
+## Draw calls
+
+Measured during 50 seconds of wave 5 with eight active enemies, bodies, decals, debris, a fire
+pool and the floodlights installed:
+
+| Preset | Max active enemies | Peak draw calls | Triangles |
+| --- | --- | --- | --- |
+| LOW | 10 | 374 | 48.7k |
+| HIGH | 16 | 545 | 71.1k |
+
+LOW is inside the 400 budget; HIGH is over it by 36%. The cost is skinned characters and effect
+pools, not the v0.6.0 content: floodlights, fires and a barricade together add about one draw call
+(measured by toggling each in an otherwise idle scene, 251 to 252). Reducing it means batching or
+LODing characters, which is a separate pass.
 
 ## Rules
 

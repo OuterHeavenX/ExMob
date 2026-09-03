@@ -48,6 +48,25 @@ describe('save schema', () => {
     expect(validateSave(out)).toEqual([]);
   });
 
+  it('migrates a v2 save to v3 by giving it a property upgrade list', () => {
+    const v2 = createDefaultSave();
+    v2.schemaVersion = 2;
+    v2.property = { id: 'cabin' };
+    const out = applyMigrations(v2);
+    expect(out.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+    expect(out.property.upgrades).toEqual([]);
+    expect(validateSave(out)).toEqual([]);
+  });
+
+  it('drops upgrade ids that are not standing installations', () => {
+    const v2 = createDefaultSave();
+    v2.schemaVersion = 2;
+    // an old save could carry the always-available defenses here; they are not purchases
+    v2.property = { id: 'cabin', upgrades: ['boards', 'door_repair', 'alarm', 'nonsense'] };
+    const out = applyMigrations(v2);
+    expect(out.property.upgrades).toEqual(['alarm']);
+  });
+
   it('refuses saves from the future', () => {
     expect(() => applyMigrations({ schemaVersion: CURRENT_SCHEMA_VERSION + 1 })).toThrow();
   });

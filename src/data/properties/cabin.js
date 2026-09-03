@@ -101,6 +101,11 @@ export const CABIN = Object.freeze({
     porch: { minX: -3, maxX: 1.2, minZ: 4.2, maxZ: 6.4, height: 0.3, light: { x: -1.0, z: 4.35, y: 2.5, color: 0xffc070, intensity: 140, distance: 14 } },
     driveway: { x: 0, fromZ: 6.5, toZ: 46, width: 4.2 },
     playerCar: { asset: 'VEH_Sedan_A', x: 5.2, z: 8.6, rot: 0.35, size: { x: 2.0, z: 4.6 }, cover: true },
+    /** Where the purchasable floodlights mount (docs/PROPERTY_SYSTEM.md, Defenses). */
+    floodlights: [
+      { id: 'flood_sw', x: -6.3, z: 4.3, y: 2.6, aim: { x: -0.6, z: 0.8 } },
+      { id: 'flood_ne', x: 6.3, z: -4.3, y: 2.6, aim: { x: 0.6, z: -0.8 } },
+    ],
     clearingRadius: 15,
     treeRing: { inner: 15, outer: 40, count: 260 },
     rocks: { count: 40, radius: 30 },

@@ -48,6 +48,21 @@ Bounty influences (via difficulty registry lookups): enemy quality tier, enemy e
 size multiplier, attack routes unlocked, boss frequency, special enemy chance, tactical
 sophistication level. In the Cabin the bounty mostly narrates escalation; waves are hand-authored.
 
+## Defense pricing (Chapter 1)
+
+| Item | Cost | Bought | Persists |
+| --- | --- | --- | --- |
+| Window boards | $80 | In the world, PREP | Until broken |
+| Door repair | $120 | In the world, PREP | Until broken |
+| Barricade | $240 | In the world, PREP | Until broken |
+| Tripwire alarm | $450 | Shop, once | Forever (saved) |
+| Floodlights | $600 | Shop, once | Forever (saved); bulbs relit between waves |
+
+The two shop installations are deliberately priced against a weapon: the alarm sits between the
+revolver ($500) and the shotgun ($900), the floodlights just under the shotgun. Wave payouts were
+raised to match (wave 4 to $1050, wave 5 to $1800), so a player who defends the property is not
+choosing between a gun and a wall for the whole chapter - but they cannot buy everything either.
+
 ## Long-term balance philosophy
 
 - The player should always be able to afford *something* meaningful between waves, but never

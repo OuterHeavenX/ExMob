@@ -24,6 +24,18 @@ export class HitSystem {
       return;
     }
     const box = hit.box;
+    if (box.kind === 'floodlight') {
+      w.defenses.damageLamp(box.floodlight, damage);
+      const sfx = w.vfx.impact('metal', x, y, z, nx, nz);
+      w.ctx.audio.play(sfx, { x, z });
+      return;
+    }
+    if (box.kind === 'barricade') {
+      w.property.damagePortal(box.portal, damage, 'bullet', { x, y, z });
+      w.vfx.impact('wood', x, y, z, nx, nz);
+      w.ctx.audio.play('impact_wood', { x, z });
+      return;
+    }
     if (box.kind === 'pane' || box.kind === 'door') {
       const portal = w.property.portals.get(box.portal);
       const surface = box.surface;

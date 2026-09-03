@@ -8,7 +8,7 @@ Fallback: `localStorage` when IndexedDB is unavailable (private mode, some WebVi
 Export/import produce a JSON blob (with schema version) for backup and device transfer.
 RESET wipes both stores.
 
-## Schema (version 2)
+## Schema (version 3)
 
 ```json
 {
@@ -43,6 +43,18 @@ RESET wipes both stores.
   "stats": { "kills": 0, "shotsFired": 0, "shotsHit": 0, "meleeHits": 0, "meleeKills": 0, "cashEarned": 0, "cashSpent": 0, "deaths": 0, "wavesSurvived": 0, "playTime": 0 }
 }
 ```
+
+## Schema versions
+
+| Version | Added |
+| --- | --- |
+| 1 | Baseline: campaign, player, weapons, property, stats |
+| 2 | Melee statistics (`stats.meleeHits`, `stats.meleeKills`) |
+| 3 | `property.upgrades`: the standing defense installations bought from the shop |
+
+Every bump ships with a migration in `src/save/migrations.js` and a test in `tests/save.test.js`.
+The v3 migration also drops ids that are not purchasable installations, because an early save
+could list `boards` and `door_repair` there and those are always available.
 
 ## When the game saves
 

@@ -37,6 +37,18 @@ export const MIGRATIONS = [
       return d;
     },
   },
+  {
+    // v0.6.0 added standing property upgrades (the tripwire alarm and the floodlights). Older
+    // saves have `property.upgrades` missing or holding the two always-available defenses.
+    from: 2, to: 3,
+    migrate(data) {
+      const d = { ...data };
+      d.property = d.property || { id: 'cabin' };
+      if (!Array.isArray(d.property.upgrades)) d.property.upgrades = [];
+      d.property.upgrades = d.property.upgrades.filter((id) => id === 'alarm' || id === 'exterior_lights');
+      return d;
+    },
+  },
 ];
 
 /**

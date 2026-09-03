@@ -165,3 +165,39 @@ portals are data.
 
 **Risks.** Two sources of truth for dimensions. Mitigation: module sizes live in one place
 (`src/data/properties/cabin.js`) and the Blender scripts read the same numbers.
+
+---
+
+## ADR-013: Fire is area denial, not a simulation
+
+**Decision.** A molotov leaves a pool that burns for a fixed time, damages whoever stands in it on
+a quarter-second tick, and pushes AI out with a steering force. It does not spread, does not
+damage the property, does not set the cabin alight, and does not touch the navigation grid.
+
+**Why.** Two reasons, one design and one performance. Design: Chapter 1 has no win/lose condition
+attached to the building, so a cabin that can burn down would need one, and that is a chapter-wide
+change to answer a single archetype. Performance: making fire block navigation would dirty and
+re-bake cells every time a bottle landed, in the middle of a fight, which is exactly the class of
+frame spike v0.5.0 removed. A repulsion force costs nothing and gets enemies out of a pool in
+about a second.
+
+**Risks.** Fire reads as more dangerous than it is if a player expects it to spread. Mitigation:
+pools are small, short-lived and visually contained, and they hurt attackers too, so the fiction
+is "he is trying to move you", not "he is burning the house down".
+
+---
+
+## ADR-014: Barricades are a layer on a portal, not a portal state
+
+**Decision.** `portal.barricadeHp` sits alongside the door's OPEN/CLOSED/BROKEN and the window's
+INTACT/SHATTERED/BOARDED rather than becoming another value of those enums. It owns a separate
+collider, and breach damage is routed to it first and never carries over into what is behind it.
+
+**Why.** The state machines for doors and windows are small and correct, and every consumer of
+`portal.state` (visuals, audio, repair, the shop, the save snapshot) would have needed a new case.
+As a layer, a door can be closed *and* barricaded, shattering the glass behind a barricade changes
+nothing, and repairing a door under one is still meaningful. It also keeps the navigation cost:
+placing a barricade adds one collider, which the dirty-rectangle path re-bakes as 48 cells.
+
+**Risks.** Two things now block one opening, so "is this passable?" has to ask both. Mitigation:
+only `BreachSystem.isPassable` answers that question, and it checks the barricade first.

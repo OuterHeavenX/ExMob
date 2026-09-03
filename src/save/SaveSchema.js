@@ -2,7 +2,7 @@ import { ECONOMY } from '../data/economy/economyRegistry.js';
 import { WEAPONS } from '../data/weapons/weaponRegistry.js';
 
 /** Save schema. Bump CURRENT_SCHEMA_VERSION with a migration + test. See docs/SAVE_SYSTEM.md. */
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 
 export function createDefaultSettings() {
   return {

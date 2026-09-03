@@ -34,6 +34,7 @@ export class CampaignManager {
     save.data.campaign.waveIndex = Math.min(e.index + 1, w.waves.waves.length - 1);
     save.data.campaign.completed = e.isLast;
     Object.assign(save.data.player, w.player.toSave(), { cash: w.economy.cash, bounty: w.bounty.bounty });
+    save.data.property = { id: 'cabin', upgrades: w.defenses.toSave() };
     Object.assign(save.data.stats, w.stats);
     await save.persist();
   }
@@ -51,6 +52,8 @@ export class CampaignManager {
     w.spawner.clearVehicles();
     w.pickups.clear();
     w.vfx.clear();
+    w.fires.clear();
+    w.lasers.clearAll();
     w.player.restore(s.player);
     w.economy.set(s.cash);
     w.bounty.set(s.bounty);

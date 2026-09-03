@@ -1,5 +1,6 @@
 import { ECONOMY } from '../economy/economyRegistry.js';
 import { WEAPONS } from '../weapons/weaponRegistry.js';
+import { DEFENSES } from '../defenses/defenseRegistry.js';
 
 /**
  * Between-wave shop items. See docs/ECONOMY.md. `action` is interpreted by ShopManager.
@@ -13,10 +14,13 @@ export const SHOP_ITEMS = Object.freeze([
   { id: 'unlock_revolver', name: WEAPONS.revolver.name, desc: 'Six rounds. Each one ends an argument.', price: WEAPONS.revolver.price, category: 'weapons', action: { type: 'unlockWeapon', weapon: 'revolver' } },
   { id: 'unlock_shotgun', name: WEAPONS.shotgun.name, desc: 'Own the doorway.', price: WEAPONS.shotgun.price, category: 'weapons', action: { type: 'unlockWeapon', weapon: 'shotgun' } },
   { id: 'unlock_smg', name: WEAPONS.smg.name, desc: 'Thirty rounds of not today.', price: WEAPONS.smg.price, category: 'weapons', action: { type: 'unlockWeapon', weapon: 'smg' } },
+  { id: 'alarm', name: DEFENSES.alarm.name, desc: DEFENSES.alarm.desc, price: ECONOMY.costs.alarm, category: 'defenses', action: { type: 'defense', defense: 'alarm' } },
+  { id: 'floodlights', name: DEFENSES.exterior_lights.name, desc: DEFENSES.exterior_lights.desc, price: ECONOMY.costs.floodlights, category: 'defenses', action: { type: 'defense', defense: 'exterior_lights' } },
 ]);
 
 /** In-world interactions with costs (E near the object during PREP). */
 export const WORLD_PURCHASES = Object.freeze({
   door_repair: { id: 'door_repair', name: 'REPAIR DOOR', price: ECONOMY.costs.doorRepair, holdTime: 1.2 },
   window_boards: { id: 'window_boards', name: 'BOARD WINDOW', price: ECONOMY.costs.windowBoards, holdTime: 1.0 },
+  barricade: { id: 'barricade', name: 'BARRICADE', price: ECONOMY.costs.barricade, holdTime: 1.8 },
 });

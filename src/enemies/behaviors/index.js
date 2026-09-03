@@ -31,6 +31,56 @@ function backOff(e, dt) {
   return moved > sp * dt * 0.2;
 }
 
+/**
+ * A cover node the sniper can actually shoot from: inside his window of ranges and with line of
+ * sight to the player. CoverNodes.best() scores the opposite (nodes that BREAK line of sight), so
+ * a rifleman needs his own pick.
+ */
+function pickVantage(e) {
+  const p = player(e), pr = prof(e).preferredRange, s = prof(e).sniper;
+  let best = null, bestScore = -Infinity;
+  for (const n of e.world.cover.nodes) {
+    const owner = e.world.cover.claimed.get(n);
+    if (owner && owner !== e && !owner.dead) continue;
+    const dT = Math.hypot(n.x - p.x, n.z - p.z);
+    if (dT < s.minRange || dT > pr.max) continue;
+    if (!e.world.los.canSee(n.x, n.z, p.x, p.z)) continue;
+    const travel = Math.hypot(n.x - e.x, n.z - e.z);
+    if (travel > 26) continue;
+    const score = 2 - Math.abs(dT - (s.minRange + pr.max) / 2) * 0.06 - travel * 0.09;
+    if (score > bestScore) { bestScore = score; best = n; }
+  }
+  if (best) { e.world.cover.release(e); e.world.cover.claimed.set(best, e); }
+  return best;
+}
+
+/** Seconds a sniper will go without a shot before he stops being picky about range. */
+const IMPATIENT_AFTER = 20;
+
+/** A sniper who has been shut out long enough will take a closer shot rather than stand there. */
+function snipeMinRange(e) {
+  return prof(e).sniper.minRange * ((e.noShotT || 0) > IMPATIENT_AFTER ? 0.35 : 1);
+}
+
+/** Walk directly away from the player. Used to keep a rifleman out of knife range. */
+function backAway(e, dt) {
+  const p = player(e);
+  const dx = e.x - p.x, dz = e.z - p.z, d = Math.hypot(dx, dz) || 1;
+  const sp = e.def.speed * 0.85;
+  e.moveBy((dx / d) * sp * dt, (dz / d) * sp * dt);
+  e.speedNorm = 0.7;
+}
+
+/** Does the melee attacker's swing connect? Reach plus the player's own radius, in front only. */
+function meleeConnects(e, m) {
+  const p = player(e);
+  const dx = p.x - e.x, dz = p.z - e.z;
+  const d = Math.hypot(dx, dz);
+  if (d > m.range + p.radius) return false;
+  const facing = Math.cos(Math.atan2(dx, dz) - e.yaw);
+  return facing > 0.35;
+}
+
 function strafe(e, dt) {
   const s = prof(e).strafe;
   if (s <= 0) { e.speedNorm = 0; return; }
@@ -62,6 +112,14 @@ export const BEHAVIORS = {
       const p = player(e), c = e.combat;
       // keep destination fresh
       if (t > 0.5 && (t % 1.0) < dt) e.nav.setDestination(p.x, p.z);
+      // specialists peel off before the generic engage rules apply
+      const sp = prof(e);
+      if (sp.melee && c.canSee && c.distance <= sp.melee.range) return 'MELEE';
+      if (sp.sniper) {
+        if (c.canSee && c.distance >= snipeMinRange(e)) return 'SNIPE';
+        // do not walk a rifleman into shotgun range while hunting for a sightline
+        if (c.distance <= snipeMinRange(e) * 1.15 && (e.noShotT || 0) <= IMPATIENT_AFTER) return 'REPOSITION';
+      }
       // engage if we can see and are in range and don't want to push further
       if (c.canSee && c.inRange && !wantsToPush(e)) return 'ENGAGE';
       if (c.canSee && prof(e).usesCover && c.distance < prof(e).preferredRange.max && Math.random() < 0.01) return 'SEEK_COVER';
@@ -77,6 +135,10 @@ export const BEHAVIORS = {
     enter(e) { e.engageT = 0; },
     update(e, dt, t) {
       const c = e.combat;
+      const sp = prof(e);
+      if (sp.sniper) return 'SNIPE';
+      if (sp.melee && c.canSee && c.distance <= sp.melee.range) return 'MELEE';
+      if (sp.throw && c.canSee && e.throwCd <= 0 && c.distance >= sp.throw.minRange && c.distance <= sp.throw.maxRange) return 'THROW';
       if (!c.canSee) return t > 0.6 ? 'SEARCH' : null;
       if (wantsToPush(e)) return 'APPROACH';
       // professionals seek cover after a burst
@@ -151,12 +213,158 @@ export const BEHAVIORS = {
         e.breachTotal++;
         if (e.breachTotal === 1 && portal.kind === 'door' && Math.random() < 0.6) e.world.events.emit(EV.TOAST, { text: `${portal.name}: BREACHING` });
       }
-      // opportunistic: player visible from the door -> engage briefly
-      if (e.combat.canSee && e.combat.distance < 4 && prof(e).aggression < 0.8) return 'ENGAGE';
+      // opportunistic: player visible from the door -> engage briefly. A breach specialist is
+      // never distracted: he is here for the door, and the player has to make him stop.
+      if (!prof(e).breachSpecialist && e.combat.canSee && e.combat.distance < 4 && prof(e).aggression < 0.8) return 'ENGAGE';
       return null;
     },
     onHit(e) {
+      if (prof(e).breachSpecialist) return null;
       if (prof(e).coverSeekOnHit && Math.random() < 0.35) return 'SEEK_COVER';
+      return null;
+    },
+  },
+
+  /**
+   * Close-quarters attack for archetypes with no gun (the breacher's sledgehammer). Self-cycling:
+   * wind up, swing, land the hit if the player is still in front and in reach, cool down, repeat.
+   */
+  MELEE: {
+    enter(e) { e.meleeArmed = false; e.meleeSwingT = 0; e.meleeCdT = 0.15; e.speedNorm = 0; },
+    update(e, dt) {
+      const m = prof(e).melee, c = e.combat;
+      e.speedNorm = 0;
+      c.face(dt);
+      c.aiming = false;
+      if (e.staggerT > 0) return null;
+      if (!c.canSee || c.distance > m.range * 1.4) return 'APPROACH';
+      if (!e.meleeArmed) {
+        e.meleeCdT -= dt;
+        if (e.meleeCdT <= 0) {
+          e.meleeArmed = true;
+          e.meleeSwingT = m.windup;
+          e.rig.melee();
+          e.world.ctx.audio.play('melee_swing', { x: e.x, z: e.z, bus: 'ENEMY_WEAPONS' });
+          e.world.events.emit(EV.ENEMY_MELEE, { enemy: e, phase: 'windup' });
+        }
+        return null;
+      }
+      e.meleeSwingT -= dt;
+      if (e.meleeSwingT > 0) return null;
+      e.meleeArmed = false;
+      e.meleeCdT = m.cooldown;
+      if (meleeConnects(e, m)) {
+        const p = player(e);
+        p.health.damage(m.damage, { x: p.x - e.x, z: p.z - e.z, melee: true });
+        e.world.ctx.audio.play('melee_hit', { x: p.x, z: p.z });
+        e.world.ctx.camera.shake(0.3);
+        e.world.events.emit(EV.ENEMY_MELEE, { enemy: e, phase: 'hit' });
+      }
+      return null;
+    },
+  },
+
+  /**
+   * Rifleman. Sets up, paints a laser on the player while the shot charges, fires, and moves to a
+   * new vantage when the player breaks line of sight or closes the distance.
+   */
+  SNIPE: {
+    enter(e) {
+      const s = prof(e).sniper;
+      e.snipeT = s.setupTime;
+      e.snipeCharge = 0;
+      e.snipeHold = s.holdTime;
+      e.speedNorm = 0;
+    },
+    update(e, dt) {
+      const s = prof(e).sniper, c = e.combat, p = player(e);
+      e.speedNorm = 0;
+      c.aiming = true;
+      c.face(dt);
+      if (c.distance < snipeMinRange(e)) { e.world.lasers.clear(e); return 'REPOSITION'; }
+      if (!c.canSee) { e.world.lasers.clear(e); return 'REPOSITION'; }
+      e.noShotT = 0;
+      if (e.snipeT > 0) { e.snipeT -= dt; return null; }
+      e.snipeCharge += dt / s.chargeTime;
+      e.world.lasers.set(e, { x: e.x, y: e.y + 1.35, z: e.z }, { x: p.x, y: p.y + 1.0, z: p.z }, Math.min(1, e.snipeCharge));
+      if (e.snipeCharge >= 1) {
+        c.snipeShot();
+        e.snipeCharge = 0;
+        e.snipeT = prof(e).fireCooldown;
+        e.world.lasers.clear(e);
+      }
+      e.snipeHold -= dt;
+      if (e.snipeHold <= 0) return 'REPOSITION';
+      return null;
+    },
+    exit(e) { e.world.lasers.clear(e); },
+    onHit(e) { return Math.random() < 0.7 ? 'REPOSITION' : null; },
+  },
+
+  /**
+   * The sniper's SEEK_COVER: find somewhere that can see the player from a distance. He never
+   * walks into knife range on purpose, so with no vantage available he backs off and keeps
+   * looking. `noShotT` is the anti-stalemate valve: a player who simply stays out of sight would
+   * otherwise leave an untouchable enemy standing and the wave unclearable, so after
+   * IMPATIENT_AFTER seconds without a shot he starts closing in and takes what he can get.
+   */
+  REPOSITION: {
+    enter(e) {
+      e.vantage = pickVantage(e);
+      if (e.vantage) e.nav.setDestination(e.vantage.x, e.vantage.z, true);
+      e.retryT = 1.0;
+    },
+    update(e, dt, t) {
+      const c = e.combat;
+      e.noShotT = (e.noShotT || 0) + dt;
+      if (c.canSee && c.distance >= snipeMinRange(e)) return 'SNIPE';
+      if (e.noShotT > IMPATIENT_AFTER) return 'APPROACH';
+      if (e.vantage) {
+        const d = Math.hypot(e.vantage.x - e.x, e.vantage.z - e.z);
+        if (d < 0.6) e.vantage = null;
+        else {
+          const r = e.nav.follow(dt, 1.15);
+          if (typeof r === 'object' || r === 'noPath' || r === 'arrived' || t > 8) e.vantage = null;
+        }
+        return null;
+      }
+      // no vantage: hold the distance, face the threat, and look again in a moment
+      if (c.distance < snipeMinRange(e) * 1.2) { backAway(e, dt); return null; }
+      e.speedNorm = 0;
+      c.face(dt);
+      e.retryT -= dt;
+      if (e.retryT <= 0) {
+        e.retryT = 1.0;
+        e.vantage = pickVantage(e);
+        if (e.vantage) e.nav.setDestination(e.vantage.x, e.vantage.z, true);
+      }
+      return null;
+    },
+    exit(e) { e.vantage = null; },
+  },
+
+  /** One bottle, thrown at where the player is standing. Committed once the windup starts. */
+  THROW: {
+    enter(e) {
+      const p = player(e);
+      e.throwT = prof(e).throw.windup;
+      e.threw = false;
+      e.throwTarget = { x: p.x, z: p.z };
+      e.speedNorm = 0;
+    },
+    update(e, dt) {
+      const th = prof(e).throw, c = e.combat;
+      e.speedNorm = 0;
+      c.face(dt);
+      c.aiming = false;
+      if (e.threw) return 'SEEK_COVER';
+      e.throwT -= dt;
+      if (e.throwT > 0) return null;
+      e.threw = true;
+      e.rig.melee();
+      e.world.fires.throwBottle(e, e.throwTarget, th.flightTime);
+      e.throwCd = th.interval;
+      e.world.ctx.audio.play('molotov_throw', { x: e.x, z: e.z, bus: 'ENEMY_WEAPONS' });
       return null;
     },
   },

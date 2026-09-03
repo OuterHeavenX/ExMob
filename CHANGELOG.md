@@ -2,6 +2,48 @@
 
 All notable changes to EXMOB are documented here. The project uses semantic versioning.
 
+## [0.6.0] - 2026-09-03
+
+Content depth for Chapter 1: three attacker archetypes with counterplay of their own, and three
+defenses to spend cash on. Chapter 1 remains the only production content.
+
+### Added
+- **BREACHER.** Sledgehammer, no gun, 110 hp. Tears through boards and barricades at 62 damage a
+  swing and will not be distracted by a visible player mid-breach. Boarded and barricaded openings
+  *attract* him rather than deterring him, so a defended door is bait as much as protection. Once
+  he is through he swings at the player instead of shooting, which is the first enemy melee in the
+  game and makes closing distance dangerous in both directions.
+- **SNIPER.** Bolt-action from the treeline, 34 damage a shot, 60 hp. Holds beyond 13 m, paints a
+  laser on the player for 1.5 seconds before firing, and moves to a new vantage when the sightline
+  breaks or the player closes. He cannot open a door or climb a window, so the answer is to break
+  line of sight or go and get him. A shut-out sniper gives up on range after 20 seconds and closes
+  in, so a player who simply hides can never leave a wave unclearable.
+- **ARSONIST.** Molotovs, 60 hp, keeps to 9-17 m. The bottle arcs and lights a pool of fire that
+  burns for 9 seconds and hurts whoever stands in it, attackers included. Fire is area denial: it
+  does not spread and does not burn the cabin down, it moves you off the chokepoint you were
+  holding.
+- **BARRICADES** ($240, in the world during PREP). Furniture and planks across a door or window,
+  240 hp, blocks line of sight and passage. A layer *on top of* the opening's own state rather
+  than a state of its own, so a door can be closed and barricaded, and shattering the window
+  behind one changes nothing. Boards first, then a barricade over them.
+- **TRIPWIRE ALARM** ($450, shop). Six more seconds of warning before every wave.
+- **FLOODLIGHTS** ($600, shop). Two lamps on opposite corners; attackers crossing a lit area are
+  60% slower to line up a shot. Each lamp has 40 hp and can be shot out, which frees its side of
+  the property until the bulbs are replaced between waves.
+- Three new Blender characters (helmet, hood and satchel silhouettes) and three new weapons
+  (rifle, sledgehammer, molotov), built by the existing generator scripts.
+
+### Changed
+- Waves 3, 4 and 5 introduce one new archetype each, in that order, so they can be learned
+  separately. Wave 4 pays $1050 (was $900) and wave 5 pays $1800 (was $1500).
+- Save schema v3: `property.upgrades` now records the standing installations. v2 saves migrate.
+
+### Measured
+Sixty seconds of wave 5 with all eight active enemies and every archetype in its own states:
+worst simulation frame **4.2 ms**, median 0.1 ms, zero frames over 8 ms. Placing a barricade
+re-bakes 48 navigation cells (0.7 ms), not the grid. Peak draw calls during that fight are 374 at
+LOW and 545 at HIGH; the HIGH figure is over the 400 budget and is logged in docs/STATUS.md.
+
 ## [0.5.0] - 2026-09-03
 
 Playtest feedback: the game stutters occasionally.

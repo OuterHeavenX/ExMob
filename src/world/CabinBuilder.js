@@ -213,7 +213,7 @@ export class CabinBuilder {
     this.root.add(g);
     // pane collider (blocks bullets and LOS while intact/boarded)
     const paneBox = this.colliders.add(ColliderSet.box(cx, cz, horizontal ? WW : T, horizontal ? T : WW, { kind: 'pane', walk: false, bullets: true, los: true, surface: 'glass', portal: id }));
-    this.portalVisuals[id] = { group: g, pane, boards, shards, paneBox, sillBox, horizontal };
+    this.portalVisuals[id] = { group: g, pane, boards, shards, paneBox, sillBox, horizontal, barricade: this._barricadeVisual(cx, cz, horizontal, WW + 0.3, wh + 0.2, yb) };
   }
 
   _doorVisual(id, cx, cz, horizontal, yb, dh, DW, T, ux, uz) {
@@ -254,7 +254,35 @@ export class CabinBuilder {
     g.add(stub);
     this.root.add(g);
     const box = this.colliders.add(ColliderSet.box(cx, cz, horizontal ? DW : T, horizontal ? T : DW, { kind: 'door', walk: true, bullets: true, los: true, surface: 'wood', portal: id }));
-    this.portalVisuals[id] = { group: g, door, stub, knob, box, horizontal, hingeSide };
+    this.portalVisuals[id] = { group: g, door, stub, knob, box, horizontal, hingeSide, barricade: this._barricadeVisual(cx, cz, horizontal, DW + 0.25, dh * 0.8, yb) };
+  }
+
+  /**
+   * Furniture and planks shoved across an opening. Hidden until the player pays for it; lives on
+   * the static root rather than the door group so it does not swing with the door.
+   */
+  _barricadeVisual(cx, cz, horizontal, width, height, yb) {
+    const geos = [];
+    const plank = (w, h, d, ox, oy, rz) => {
+      const g2 = new THREE.BoxGeometry(w, h, d);
+      g2.rotateZ(rz);
+      g2.translate(ox, oy, 0);
+      geos.push(g2);
+    };
+    // three planks across, two diagonal braces, one heavy block low down (the furniture)
+    for (let i = 0; i < 3; i++) plank(width, 0.18, 0.07, (i - 1) * 0.04, height * (0.25 + i * 0.26), (i - 1) * 0.05);
+    plank(width * 1.12, 0.13, 0.06, 0, height * 0.5, 0.55);
+    plank(width * 1.12, 0.13, 0.06, 0, height * 0.5, -0.55);
+    plank(width * 0.72, height * 0.34, 0.22, 0, height * 0.17, 0);
+    const geo = mergeGeometries(geos, false);
+    geo.rotateY(horizontal ? 0 : Math.PI / 2);
+    geo.translate(cx, yb, cz);
+    const mesh = new THREE.Mesh(geo, this.M.boards);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.visible = false;
+    this.root.add(mesh);
+    return mesh;
   }
 
   // ---------- roof

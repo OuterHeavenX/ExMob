@@ -36,6 +36,7 @@ export class PropertyManager {
         id, def, kind: def.kind, name: def.name, x: def.x, z: def.z, axis: def.axis, facing: def.facing, room: def.room, exterior: def.exterior,
         state: def.kind === 'door' ? 'closed' : 'intact',
         hp: def.hp, maxHp: def.hp, boardHp: 0, maxBoardHp: def.boardHp || 0,
+        barricadeHp: 0, maxBarricadeHp: 0, barricadeBox: null,
         vis, navBox: def.kind === 'door' ? vis.box : vis.sillBox,
         openAngle: 0,
       };
@@ -64,10 +65,11 @@ export class PropertyManager {
     return best;
   }
 
-  /** Damage a portal (door hp or window boards). source: 'bullet'|'breach'. */
+  /** Damage a portal: the barricade first, then the door's own hp or the window's boards. */
   damagePortal(id, amount, source = 'breach', hitPos = null) {
     const p = this.portals.get(id);
     if (!p) return false;
+    if (p.barricadeHp > 0) return this.barricades.damage(p, amount, source, hitPos);
     if (p.kind === 'door') return this.doors.damage(p, amount, source, hitPos);
     return this.windows.damage(p, amount, source, hitPos);
   }
@@ -105,16 +107,26 @@ export class PropertyManager {
 
   /** Between-wave: restore destroyed props? No - damage persists (docs). Only doors/boards are repairable. */
 
-  /** Interactables near the player for the E prompt during PREP or for doors any time. */
+  /**
+   * Interactables near the player. `type` is what a tap does, `holdType` (optional) what holding
+   * does, so a door can still be opened during PREP while a hold barricades it. Barricading is
+   * offered as the layer *after* the cheap one: board a window before you barricade it.
+   */
   interactableNear(x, z, phase) {
-    // doors: open/close (any phase) or repair (prep)
+    const prep = phase === 'prep';
     const door = this.nearestPortal(x, z, 1.7, (p) => p.kind === 'door');
     if (door) {
-      if (door.state === 'broken') return phase === 'prep' ? { type: 'repair', portal: door } : null;
-      return { type: door.state === 'open' ? 'close' : 'open', portal: door };
+      if (door.barricadeHp > 0) return prep ? null : null; // nothing to do at a barricaded door
+      if (door.state === 'broken') return prep ? { type: 'repair', portal: door } : null;
+      const tap = { type: door.state === 'open' ? 'close' : 'open', portal: door };
+      if (prep && door.exterior && door.state === 'closed') tap.holdType = 'barricade';
+      return tap;
     }
     const win = this.nearestPortal(x, z, 1.7, (p) => p.kind === 'window');
-    if (win && phase === 'prep' && win.state !== 'boarded') return { type: 'board', portal: win };
+    if (win && prep && win.barricadeHp <= 0) {
+      if (win.state !== 'boarded') return { type: 'board', portal: win };
+      return { type: 'barricade', portal: win };
+    }
     return null;
   }
 
@@ -128,20 +140,27 @@ export class PropertyManager {
   portalCost(id, profile) {
     const p = this.portals.get(id);
     if (!p) return 0;
+    // a barricade is extra work on top of whatever is behind it, except for the archetype whose
+    // whole job is defended entries: for him it is a signpost, not a deterrent
+    let extra = 0;
+    if (p.barricadeHp > 0) {
+      if (!profile.canBreachDoors) return Infinity;
+      extra = profile.prefersDefended ? -12 : 55;
+    } else if (profile.prefersDefended && p.kind === 'window' && p.state === 'boarded') extra = -10;
     if (p.kind === 'door') {
       if (!profile.canBreachDoors && p.state === 'closed') return Infinity;
-      return p.state === 'closed' ? 18 : 0;
+      return Math.max(0, (p.state === 'closed' ? 18 : 0) + extra);
     }
     if (!profile.canEnterWindows) return Infinity;
-    if (p.state === 'boarded') return 46;
-    if (p.state === 'intact') return 30;
-    return 6;
+    if (p.state === 'boarded') return Math.max(0, 46 + extra);
+    if (p.state === 'intact') return Math.max(0, 30 + extra);
+    return Math.max(0, 6 + extra);
   }
 
   /** Snapshot for retry (portal + prop state). */
   snapshot() {
     return {
-      portals: Array.from(this.portals.values()).map((p) => ({ id: p.id, state: p.state, hp: p.hp, boardHp: p.boardHp })),
+      portals: Array.from(this.portals.values()).map((p) => ({ id: p.id, state: p.state, hp: p.hp, boardHp: p.boardHp, barricadeHp: p.barricadeHp })),
       props: Array.from(this.props.values()).map((p) => ({ id: p.id, hp: p.hp, destroyed: p.destroyed })),
     };
   }
@@ -151,6 +170,7 @@ export class PropertyManager {
       const p = this.portals.get(s.id);
       if (!p) continue;
       if (p.kind === 'door') this.doors.setState(p, s.state, s.hp); else this.windows.setState(p, s.state, s.boardHp);
+      this.barricades.setHp(p, s.barricadeHp || 0);
     }
     for (const s of snap.props) {
       const p = this.props.get(s.id);

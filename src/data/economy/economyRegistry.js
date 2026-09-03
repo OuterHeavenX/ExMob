@@ -9,6 +9,9 @@ export const ECONOMY = Object.freeze({
   costs: Object.freeze({
     doorRepair: 120,
     windowBoards: 80,
+    barricade: 240,
+    alarm: 450,
+    floodlights: 600,
     ammoCurrent: 150,
     ammoAll: 350,
     heal: 200,

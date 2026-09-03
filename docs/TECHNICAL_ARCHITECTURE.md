@@ -92,6 +92,10 @@ emissive lamp materials, pooled muzzle point lights, instanced trees/rocks/grass
   frame, re-plan on portal state change. The grid re-bakes incrementally from collider dirty
   rectangles; a full bake is a load-time operation only (docs/PERFORMANCE_BUDGET.md, Frame spikes).
 - Shaders are compiled at scene load so nothing compiles mid-fight.
+- Hazards (`src/hazards/`): pooled fire zones with damage ticks and an AI repulsion force. Not
+  part of the navigation grid by design (docs/PERFORMANCE_BUDGET.md).
+- Defenses (`src/defenses/`): standing property installations bought from the shop, saved in
+  `property.upgrades`. Portal-attached defenses (boards, barricades) live in `src/property/`.
 - No per-frame allocations in hot loops (reused vectors).
 - Frustum culling on, shadow map updates on a budget, instancing for vegetation.
 - Budgets in PERFORMANCE_BUDGET.md.

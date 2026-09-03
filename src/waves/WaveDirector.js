@@ -8,12 +8,14 @@ import { wavePopulation } from '../data/waves/cabinWaves.js';
  * director is testable without Three.js.
  */
 export class WaveDirector {
-  constructor({ waves, events, spawner, getActiveCount, capClamp = 99, difficulty = null }) {
+  constructor({ waves, events, spawner, getActiveCount, capClamp = 99, difficulty = null, warningBonus = null }) {
     this.waves = waves;
     this.events = events;
     this.spawner = spawner;
     this.getActiveCount = getActiveCount;
     this.capClamp = capClamp;
+    // extra seconds of warning bought by the tripwire alarm, read fresh each wave
+    this.warningBonus = warningBonus || (() => 0);
     this.difficulty = difficulty || { groupSize: 1, reinforcementInterval: 1 };
     this.index = 0;
     this.phase = 'IDLE';
@@ -63,8 +65,8 @@ export class WaveDirector {
   _enterWarning() {
     const w = this.wave;
     this.phase = 'WARNING';
-    this.warningTotal = w.warningTime;
-    this.timer = w.warningTime;
+    this.warningTotal = w.warningTime + this.warningBonus();
+    this.timer = this.warningTotal;
     this.events.emit(EV.WAVE_WARNING, { wave: w, index: this.index, time: this.timer });
   }
 

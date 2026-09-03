@@ -50,7 +50,9 @@ export class NavGrid {
       if (!b) continue;
       if (x >= b.minX - this.cell && x <= b.maxX + this.cell && z >= b.minZ - this.cell && z <= b.maxZ + this.cell) { portalHit = id; break; }
     }
-    const blocker = this.colliders.circleOverlaps(x, z, portalHit ? r * 0.45 : r, (b) => b.kind !== 'door' && b.kind !== 'sill' && b.kind !== 'rail');
+    // a barricade is treated like a closed door: the cell stays a portal cell so A* can plan
+    // through it and price it, and the collider still stops anyone physically walking in
+    const blocker = this.colliders.circleOverlaps(x, z, portalHit ? r * 0.45 : r, (b) => b.kind !== 'door' && b.kind !== 'sill' && b.kind !== 'rail' && b.kind !== 'barricade');
     if (portalHit && !blocker) {
       this.walk[i] = 1;
       this.portalIdx[i] = this._portalIndex.get(portalHit);

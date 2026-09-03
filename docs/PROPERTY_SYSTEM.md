@@ -52,6 +52,31 @@ simple gravity/bounce integrator.
 
 After a wave the player can walk through the wreckage. Repairs are deliberate and cost cash.
 
+## Defenses (Chapter 1)
+
+| Defense | Cost | Where | Effect |
+| --- | --- | --- | --- |
+| Window boards | $80 | In the world, PREP | 90 hp of planks over a window |
+| Door repair | $120 | In the world, PREP | Rehangs a broken door |
+| Barricade | $240 | In the world, PREP | 240 hp across a door or window, blocks line of sight |
+| Tripwire alarm | $450 | Shop, once | +6 seconds of warning before every wave |
+| Floodlights | $600 | Shop, once | Two lamps; attackers in the light are 60% slower to shoot |
+
+A **barricade is a layer, not a state**. `portal.barricadeHp` sits alongside the door's own
+OPEN/CLOSED/BROKEN or the window's INTACT/SHATTERED/BOARDED, so a door can be closed *and*
+barricaded and shattering the glass behind one changes nothing about it. It carries its own
+collider, added when it goes up and removed when it comes down, so the navigation grid re-bakes
+only that opening (48 cells, 0.7 ms) rather than the whole property. Breach damage goes through
+the barricade first and never carries over into what is behind it.
+
+The interaction offers the cheap layer first: a window wants boards before it will take a
+barricade. A door keeps working normally during PREP - a tap opens or closes it, a hold barricades
+it - so buying a barricade never costs you the ability to use the door up to that moment.
+
+**Floodlights** are the only defense that can be destroyed mid-wave. Each lamp has 40 hp and a
+12 m radius; the two mounts are 16 m apart, so shooting one out frees its side of the property and
+leaves the other side lit. Bulbs are replaced free between waves - the install was the expense.
+
 ## Defense catalog (long-term)
 
 | Defense | Effect | Chapter |

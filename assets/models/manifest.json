@@ -1,11 +1,14 @@
 {
-  "generated": "2026-09-02T21:56:24.414Z",
+  "generated": "2026-09-03T20:17:46.927Z",
   "blender": "C:\\Program Files\\Blender Foundation\\Blender 5.2\\blender.exe",
   "assets": [
+    "CHR_Arsonist01",
+    "CHR_Breacher01",
     "CHR_Enforcer01",
     "CHR_ExMob",
     "CHR_Goon01",
     "CHR_Hitman01",
+    "CHR_Sniper01",
     "CHR_Soldier01",
     "ENV_Cabin_Corner_A",
     "ENV_Cabin_Door_A",
@@ -45,10 +48,13 @@
     "PRP_Toilet_A",
     "PRP_Tub_A",
     "VEH_Sedan_A",
+    "WPN_Molotov01",
     "WPN_Pistol01",
     "WPN_Revolver01",
+    "WPN_Rifle01",
     "WPN_SMG01",
-    "WPN_Shotgun01"
+    "WPN_Shotgun01",
+    "WPN_Sledge01"
   ],
-  "totalBytes": 348388
+  "totalBytes": 1530448
 }

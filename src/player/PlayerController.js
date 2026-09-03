@@ -72,36 +72,51 @@ export class PlayerController {
     w.ctx.camera.aimDir.set(this.aim.x, this.aim.z);
   }
 
+  /**
+   * Context interaction. A tap does the cheap thing (open the door, or the single action on
+   * offer); holding does `holdType` when the opening has a second, paid layer available. The
+   * door toggle fires on release so that starting a barricade hold does not swing the door open
+   * first (docs/PROPERTY_SYSTEM.md, Defenses).
+   */
   _updateInteraction(dt, input, locked) {
     const p = this.p, w = p.world;
     const phase = w.waves.phase;
     const it = locked ? null : w.property.interactableNear(p.x, p.z, phase);
+    const held = !locked && input.held('interact');
     let text = '';
     if (it) {
-      const cost = w.property.barricades.costFor(it);
-      const label = { open: 'OPEN DOOR', close: 'CLOSE DOOR', repair: 'REPAIR DOOR', board: 'BOARD WINDOW' }[it.type];
-      text = cost > 0 ? `${label}  $${cost}` : label;
+      const isToggle = it.type === 'open' || it.type === 'close';
+      // what a hold buys here: an explicit holdType, or the interaction itself when it is paid
+      const holdIt = it.holdType ? { type: it.holdType, portal: it.portal } : (isToggle ? null : it);
+      const cost = holdIt ? w.property.barricades.costFor(holdIt) : 0;
+      const LABELS = { open: 'OPEN DOOR', close: 'CLOSE DOOR', repair: 'REPAIR DOOR', board: 'BOARD WINDOW', barricade: 'BARRICADE' };
+      text = LABELS[it.type] + (holdIt && holdIt.type === it.type && cost > 0 ? `  $${cost}` : '');
+      if (holdIt && holdIt.type !== it.type) text += `   HOLD: ${LABELS[holdIt.type]} $${cost}`;
       const same = this.interaction && this.interaction.portal === it.portal && this.interaction.type === it.type;
-      if (!same) { this.interaction = it; this.holdT = 0; this.holdNeeded = w.property.barricades.holdTimeFor(it); }
-      if (it.type === 'open' || it.type === 'close') {
-        if (input.pressed('interact')) w.property.doors.toggle(it.portal);
-      } else if (input.held('interact')) {
+      if (!same) { this.interaction = it; this.holdT = 0; this.holdNeeded = holdIt ? w.property.barricades.holdTimeFor(holdIt) : 0; }
+      if (held && holdIt) {
         if (w.economy.cash < cost) {
           if (input.pressed('interact')) { w.ctx.audio.play('ui_denied'); w.events.emit(EV.TOAST, { text: 'NOT ENOUGH CASH' }); }
         } else {
           this.holdT += dt;
           if (this.holdT >= this.holdNeeded) {
-            if (w.property.barricades.apply(it, w.economy)) { w.ctx.audio.play('ui_buy'); w.ctx.audio.play('board_hit', { x: it.portal.x, z: it.portal.z }); }
+            if (w.property.barricades.apply(holdIt, w.economy)) { w.ctx.audio.play('ui_buy'); w.ctx.audio.play('board_hit', { x: it.portal.x, z: it.portal.z }); }
             this.holdT = 0;
             this.interaction = null;
           }
         }
-      } else this.holdT = 0;
+      } else {
+        // released: a short press on a door is a toggle, a long one was an abandoned hold
+        if (isToggle && this._heldLast && this.holdT < 0.3) w.property.doors.toggle(it.portal);
+        else if (isToggle && !holdIt && input.pressed('interact')) w.property.doors.toggle(it.portal);
+        this.holdT = 0;
+      }
     } else { this.interaction = null; this.holdT = 0; }
+    this._heldLast = held && !!it;
     const progress = this.holdNeeded > 0 ? this.holdT / this.holdNeeded : 0;
     if (text !== this.promptText || progress > 0 || this._lastProgress > 0) {
       this.promptText = text;
-      w.events.emit(EV.INTERACT_PROMPT, { text, progress, hold: !!it && (it.type === 'repair' || it.type === 'board') });
+      w.events.emit(EV.INTERACT_PROMPT, { text, progress, hold: !!it && it.type !== 'open' && it.type !== 'close' });
     }
     this._lastProgress = progress;
   }

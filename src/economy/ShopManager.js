@@ -30,6 +30,7 @@ export class ShopManager {
     if (a.type === 'unlockWeapon') {
       if (p.combat.weapons[a.weapon].owned) return { visible: true, enabled: false, reason: 'OWNED' };
     }
+    if (a.type === 'defense' && this.world.defenses.has(a.defense)) return { visible: true, enabled: false, reason: 'INSTALLED' };
     if (a.type === 'heal' && p.health.hp >= p.health.max) return { visible: true, enabled: false, reason: 'FULL' };
     if (a.type === 'armor' && p.health.armor >= ECONOMY.armor.points) return { visible: true, enabled: false, reason: 'FULL' };
     if (a.type === 'ammo') {
@@ -52,6 +53,7 @@ export class ShopManager {
       case 'heal': p.health.heal(); break;
       case 'armor': p.health.addArmor(ECONOMY.armor.points); break;
       case 'unlockWeapon': p.combat.unlock(a.weapon); p.combat.equip(a.weapon, true); break;
+      case 'defense': this.world.defenses.install(a.defense); break;
       default: break;
     }
     this.world.ctx.audio.play('ui_buy');

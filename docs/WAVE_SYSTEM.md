@@ -70,6 +70,21 @@ PREP  ->  WARNING  ->  ACTIVE  ->  CLEARED  ->  (next PREP)  ...  ->  CHAPTER CO
 
 Exact numbers are data and will be tuned. The table reflects the shipped registry values.
 
+## Chapter 1 archetype introduction
+
+Each new archetype gets its own wave to be learned in, and the wave before it teaches the thing it
+punishes:
+
+| Wave | Introduces | What it tests |
+| --- | --- | --- |
+| 1-2 | Goons | Movement, aiming, the doorway |
+| 3 | Breacher | Whether boards and barricades were bought, and whether you defend them |
+| 4 | Sniper | Whether you stay out of open ground and use the walls |
+| 5 | Arsonist (plus all of the above and the hitman) | Whether you can give up a position |
+
+The tripwire alarm adds its `warningBonus` to every warning phase, read fresh each wave so a
+mid-chapter purchase takes effect on the next one.
+
 ## Difficulty modifiers
 
 `src/data/difficulty/` scales: aggression, accuracy, group size multiplier, reinforcement

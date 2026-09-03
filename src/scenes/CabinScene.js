@@ -8,6 +8,9 @@ import { CoverNodes } from '../ai/CoverNodes.js';
 import { LineOfSight } from '../ai/LineOfSight.js';
 import { VFXManager } from '../vfx/VFXManager.js';
 import { AimIndicator } from '../vfx/AimIndicator.js';
+import { LaserSights } from '../vfx/LaserSights.js';
+import { FireSystem } from '../hazards/FireSystem.js';
+import { DefenseManager } from '../defenses/DefenseManager.js';
 import { Player } from '../player/Player.js';
 import { EnemyManager } from '../enemies/EnemyManager.js';
 import { ProjectileSystem } from '../combat/ProjectileSystem.js';
@@ -57,7 +60,10 @@ export class CabinScene {
     };
     world.vfx = new VFXManager(scene, ctx.quality, lighting);
     world.aimIndicator = new AimIndicator(scene);
+    world.lasers = new LaserSights(scene);
     world.property = new PropertyManager(CABIN, builder, ctx, world);
+    world.fires = new FireSystem(world);
+    world.defenses = new DefenseManager(world, CABIN);
     world.cover = new CoverNodes(builder.colliders);
     for (const n of CABIN.coverNodes) world.cover.addNode(n.x, n.z, 'data');
     world.cover.addFromTrees(builder.trees, 22);
@@ -85,12 +91,14 @@ export class CabinScene {
       waves: CABIN_WAVES, events, spawner: world.spawner,
       getActiveCount: () => world.enemies.activeCount,
       capClamp: ctx.quality.preset.maxActiveEnemies, difficulty: ctx.difficulty,
+      warningBonus: () => world.defenses.warningBonus,
     });
     world.shop = new ShopManager(world);
     world.cinematics = new CinematicDirector(world);
     world.campaign = new CampaignManager(world);
     if (save && !this.fresh) { world.player.fromSave(save.player); Object.assign(world.stats, save.stats || {}); }
     else if (save) world.player.fromSave(save.player);
+    if (save && !this.fresh) world.defenses.fromSave(save.property?.upgrades);
 
     // UI
     this.ui = new GameUI(ctx, world);
@@ -104,7 +112,7 @@ export class CabinScene {
       events.on(EV.WAVE_START, (e) => ctx.audio.setMusicState(e.wave.music)),
       events.on(EV.WAVE_PREP, () => { ctx.audio.setMusicState('prep'); this.ui.touchPhase('prep'); }),
       events.on(EV.WAVE_WARNING, () => { world.shop.setOpen(false); this.ui.touchPhase('warning'); }),
-      events.on(EV.WAVE_CLEARED, () => { ctx.audio.setMusicState('prep'); }),
+      events.on(EV.WAVE_CLEARED, () => { ctx.audio.setMusicState('prep'); world.fires.clear(); world.defenses.resetLamps(); }),
       ctx.quality.onChange((p) => { world.waves.capClamp = p.maxActiveEnemies; }),
     ];
     wallFader.setInside(world.property.isInside(world.player.x, world.player.z));
@@ -191,6 +199,7 @@ export class CabinScene {
     const showAim = aimLine !== 'off' && (aimLine === 'on' || ctx.input.mode === 'touch')
       && !w.player.health.dead && !w.cinematicActive && !w.paused;
     w.aimIndicator.update(dt, w.player, w.player.controller.aim, w.player.controller.aimTarget, w, showAim);
+    w.fires.update(dt);
     w.spawner.update(dt);
     w.playerCar.update(dt);
     w.waves.update(dt);
@@ -218,6 +227,8 @@ export class CabinScene {
     for (const off of this._offs) off();
     this.ui.hide();
     this.world.cinematics.abort();
+    this.world.lasers.clearAll();
+    this.world.fires.clear();
     this.world.economy.dispose();
     this.world.bounty.dispose();
     this.world.campaign.dispose();

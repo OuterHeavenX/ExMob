@@ -8,6 +8,7 @@ export class BreachSystem {
   isPassable(portalId) {
     const p = this.pm.portals.get(portalId);
     if (!p) return true;
+    if (p.barricadeHp > 0) return false; // a barricade beats whatever is behind it
     if (p.kind === 'door') return p.state !== 'closed';
     return p.state === 'shattered';
   }
@@ -45,5 +46,14 @@ export class BreachSystem {
     const dmg = enemy.def.profile.breachDamage;
     this.pm.damagePortal(portalId, dmg, 'breach', { x: p.x, y: 1.0, z: p.z });
     return this.isPassable(portalId);
+  }
+
+  /** What an enemy is currently chewing through, for HUD/bark purposes. */
+  layerOf(portalId) {
+    const p = this.pm.portals.get(portalId);
+    if (!p) return null;
+    if (p.barricadeHp > 0) return 'barricade';
+    if (p.kind === 'window' && p.state === 'boarded') return 'boards';
+    return p.kind;
   }
 }

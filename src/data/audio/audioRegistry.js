@@ -42,6 +42,16 @@ export const SFX = Object.freeze({
   heartbeat:      { bus: 'ENVIRONMENT', synth: 'heartbeat', gain: 0.5 },
   dodge:          { bus: 'ENVIRONMENT', synth: 'whoosh', gain: 0.4 },
   enemy_death:    { bus: 'DIALOGUE', synth: 'grunt', gain: 0.5 },
+  rifle_fire:     { bus: 'ENEMY_WEAPONS', synth: 'gunshot', body: 1.1, crack: 1.2, tail: 0.9, pitch: 0.65, gain: 1.0 },
+  rifle_bolt:     { bus: 'ENEMY_WEAPONS', synth: 'pump', gain: 0.5, pitch: 1.2 },
+  sledge_hit:     { bus: 'IMPACTS', synth: 'thud', gain: 1.0, pitch: 0.6 },
+  molotov_throw:  { bus: 'ENEMY_WEAPONS', synth: 'whoosh', gain: 0.6, pitch: 0.8 },
+  molotov_break:  { bus: 'IMPACTS', synth: 'glass', gain: 0.9, pitch: 0.7 },
+  fire_burn:      { bus: 'ENVIRONMENT', synth: 'buzz', gain: 0.35, pitch: 0.5 },
+  barricade_place:{ bus: 'ENVIRONMENT', synth: 'thud', gain: 0.7, pitch: 0.7 },
+  barricade_hit:  { bus: 'IMPACTS', synth: 'thud', gain: 0.7, pitch: 0.85 },
+  alarm_trip:     { bus: 'ENVIRONMENT', synth: 'buzz', gain: 0.8, pitch: 2.2 },
+  floodlight_on:  { bus: 'ENVIRONMENT', synth: 'click', gain: 0.6, pitch: 0.7 },
 });
 
 export const MUSIC_STATES = Object.freeze({
