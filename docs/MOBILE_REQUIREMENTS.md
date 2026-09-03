@@ -8,15 +8,48 @@ first-class target, not a port.
 - Left half of the screen: floating virtual move stick (appears where the thumb lands).
 - Right half: floating virtual aim stick. Pushing past 55% of its radius fires; the stick angle
   is the aim direction. Releasing stops firing.
-- Buttons (right side, above the aim stick): MELEE, INTERACT, RELOAD, WEAPON (cycle), DODGE.
-  MELEE lights up while an enemy is inside its reach, which is how the action is taught on touch
-  (there is no key prompt to read).
+- Buttons (right side, above the aim stick, two rows of three): MELEE, INTERACT, RELOAD,
+  WEAPON (cycle), DODGE. MELEE lights up while an enemy is inside its reach, which is how the
+  action is taught on touch (there is no key prompt to read). PAUSE sits in the top corner clear
+  of the cash/bounty readout.
 - Top: PAUSE. Between waves: SHOP and READY.
 - Buttons are at least 56 CSS px, with generous hit slop. Layout scales with the `touchScale`
   setting.
 - Multi-touch: sticks and buttons track by pointer id. A finger sliding off a button keeps the
   button owned until release.
 - Touch mode is auto-detected on first touch input and can be forced in settings.
+
+## Aiming
+
+A mouse gives a world-space point; a thumb gives a direction and nothing else, with no cursor to
+look at. Touch aiming therefore needs help that desktop does not, and it is data-driven in
+`src/data/aim.js`:
+
+- **Aim line** (`src/vfx/AimIndicator.js`): a ground line from Ray along the aim direction,
+  trimmed where it meets a wall, plus a pulsing ring on the acquired target. Without it the
+  player is swiping blind. Default: on for touch, off for mouse (`aimLine` setting).
+- **Aim assist** (`src/combat/AimAssist.js`): rotates the raw stick direction toward the best
+  target inside a cone. Presets:
+
+  | Preset | Cone | Snap | Pull | Range | Auto-face |
+  | --- | --- | --- | --- | --- | --- |
+  | OFF | - | - | - | - | - |
+  | LIGHT | 14 deg | 4 deg | 0.6 | 28 m | no |
+  | STRONG | 26 deg | 10 deg | 0.95 | 34 m | 14 m |
+
+  Inside `snap` the aim locks exactly on target; between `snap` and `cone` it closes `pull` of
+  the remaining angle; outside `cone` nothing changes, so deliberately shooting elsewhere still
+  works. Targets behind cover are never acquired. Default: STRONG on touch, OFF on mouse.
+- **Auto-facing**: with no thumb on the aim stick, Ray turns to the nearest visible threat
+  within `autoTargetRange`. Keeps him oriented while the player moves with one thumb and makes
+  melee usable without aiming.
+- **Fire threshold**: the aim stick fires at 35% deflection, not 55%. Aiming and firing are the
+  same thumb, and requiring a hard push to fire is precisely what ruins precision. `TOUCH FIRING`
+  can also be set to FIRE ONLY WHEN AIMED, which holds fire until assist has acquired someone
+  (ammo costs cash, so spraying at walls is a real loss).
+
+Measured effect (in-browser, deliberately sloppy swipe 20 degrees off a goon 6 m away, 10 shots):
+0/10 hits with assist off, 10/10 with STRONG, average aim error 20 degrees down to 1 degree.
 
 ## Safe areas
 

@@ -1,11 +1,11 @@
 import { el } from '../utils/dom.js';
+import { TOUCH_AIM } from '../data/aim.js';
 
 /**
  * First-class touch controls: floating dual virtual sticks + context buttons.
  * Left half: move stick. Right half: aim stick; pushing past FIRE_THRESHOLD fires.
  * Buttons track pointer ids so multi-touch is reliable. See docs/MOBILE_REQUIREMENTS.md.
  */
-const FIRE_THRESHOLD = 0.55;
 const STICK_RADIUS = 60;
 
 export class TouchInput {
@@ -19,11 +19,15 @@ export class TouchInput {
     this._pointers = new Map(); // pointerId -> {kind, stick}
     this.visible = false;
     this.scale = 1;
+    this.fireMode = 'hold';
     this._buildButtons();
     this._bind();
   }
 
   setScale(s) { this.scale = s; this.root.style.setProperty('--touch-scale', String(s)); }
+
+  /** 'hold' fires on any deflection past the threshold; 'aimed' only fires with a target in the cone. */
+  setFireMode(mode) { this.fireMode = TOUCH_AIM.fireModes.includes(mode) ? mode : 'hold'; }
 
   setVisible(v) {
     this.visible = v;
@@ -140,9 +144,10 @@ export class TouchInput {
       m.move.x = mv.x * k; m.move.y = mv.y * k;
     } else { m.move.x = 0; m.move.y = 0; }
     const am = this.aimStick;
-    if (am.active && am.mag > 0.2) {
+    if (am.active && am.mag > TOUCH_AIM.aimDeadZone) {
       m.aimVector = { x: am.x, y: am.y };
-      m.fire = am.mag >= FIRE_THRESHOLD;
+      // 'aimed' holds fire until assist has acquired something, so ammo is not sprayed at walls
+      m.fire = this.fireMode === 'aimed' ? !!m.aimHasTarget : am.mag >= TOUCH_AIM.fireThreshold;
     } else {
       m.aimVector = null;
       m.fire = false;

@@ -2,6 +2,28 @@
 
 All notable changes to EXMOB are documented here. The project uses semantic versioning.
 
+## [0.4.0] - 2026-09-03
+
+Playtest feedback: shooting on a phone meant swiping toward an enemy and hoping.
+
+### Added
+- **Aim line** for touch play: a ground line showing exactly where you point, trimmed where it
+  meets a wall, with a pulsing ring on the acquired target (`src/vfx/AimIndicator.js`).
+- **Aim assist** (`src/combat/AimAssist.js`, presets in `src/data/aim.js`): rotates the raw stick
+  direction toward the best target inside a cone. Snaps exactly on target inside 10 degrees,
+  closes 95% of the error out to 26 degrees, and changes nothing beyond that, so the player still
+  picks the target. Targets behind cover are never acquired. Measured on a 20 degree off-target
+  swipe at 6 m: 0/10 hits before, 10/10 after.
+- **Auto-facing**: with no thumb on the aim stick, Ray turns to the nearest visible threat within
+  14 m, so moving and meleeing with one thumb works.
+- Settings for AIM ASSIST (auto/off/light/strong), AIM LINE (auto/always/off) and TOUCH FIRING
+  (hold to fire / fire only when aimed).
+
+### Changed
+- The touch aim stick now fires at 35% deflection instead of 55%: a small, precise push shoots,
+  where before precision required a hard push that ruined it.
+- Desktop is deliberately untouched. Aim assist and the aim line default to off for mouse play.
+
 ## [0.3.0] - 2026-09-03
 
 Playtest feedback: enemies that reach you need an answer that is not the gun.

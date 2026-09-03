@@ -62,12 +62,14 @@ export class Game {
     this.input = new InputManager(this.events, { forceTouch: CONFIG.forceTouch || this.settings.inputMode === 'touch', device: this.quality.device });
     if (this.settings.inputMode === 'desktop') this.input.setMode('desktop');
     this.input.touch.setScale(this.settings.touchScale || 1);
+    this.input.touch.setFireMode(this.settings.touchFireMode || 'hold');
     this.audio = new AudioManager(this.settings);
     this.camera.shakeScale = this.settings.screenShake ?? 1;
     this.events.on(EV.SETTINGS_CHANGED, (s) => {
       this.audio.applySettings(s);
       this.camera.shakeScale = s.screenShake ?? 1;
       this.input.touch.setScale(s.touchScale || 1);
+      this.input.touch.setFireMode(s.touchFireMode || 'hold');
       if (s.inputMode === 'touch') this.input.setMode('touch');
       else if (s.inputMode === 'desktop') this.input.setMode('desktop');
     });

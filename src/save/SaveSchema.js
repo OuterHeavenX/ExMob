@@ -14,6 +14,9 @@ export function createDefaultSettings() {
     touchScale: 1.0,
     difficulty: 'normal',
     inputMode: 'auto',
+    aimAssist: 'auto',
+    aimLine: 'auto',
+    touchFireMode: 'hold',
   };
 }
 

@@ -1,6 +1,7 @@
 import { el } from '../utils/dom.js';
 import { QUALITY_ORDER, QUALITY_PRESETS } from '../data/quality.js';
 import { DIFFICULTY } from '../data/difficulty/difficultyRegistry.js';
+import { AIM_ASSIST } from '../data/aim.js';
 
 /** Settings panel shared by the title screen and the pause menu. Persists via SaveManager. */
 export class SettingsMenu {
@@ -38,6 +39,9 @@ export class SettingsMenu {
       this._row('SCREEN SHAKE', this._slider(s.screenShake, (v) => { s.screenShake = v; apply(); }, 0, 1.5)),
       this._row('TOUCH CONTROL SIZE', this._slider(s.touchScale, (v) => { s.touchScale = v; apply(); }, 0.7, 1.5)),
       this._row('INPUT', this._select(s.inputMode, [['auto', 'AUTO'], ['desktop', 'KEYBOARD + MOUSE'], ['touch', 'TOUCH']], (v) => { s.inputMode = v; apply(); })),
+      this._row('AIM ASSIST', this._select(s.aimAssist || 'auto', [['auto', 'AUTO (ON FOR TOUCH)'], ...Object.values(AIM_ASSIST).map((a) => [a.id, a.label])], (v) => { s.aimAssist = v; apply(); })),
+      this._row('AIM LINE', this._select(s.aimLine || 'auto', [['auto', 'AUTO (TOUCH ONLY)'], ['on', 'ALWAYS'], ['off', 'OFF']], (v) => { s.aimLine = v; apply(); })),
+      this._row('TOUCH FIRING', this._select(s.touchFireMode || 'hold', [['hold', 'HOLD TO FIRE'], ['aimed', 'FIRE ONLY WHEN AIMED']], (v) => { s.touchFireMode = v; apply(); })),
       this._row('DIFFICULTY', this._select(s.difficulty, Object.values(DIFFICULTY).map((d) => [d.id, d.label + (d.balanced ? '' : ' (UNBALANCED)')]), (v) => { s.difficulty = v; apply(); })),
       el('div', { class: 'row' }, [
         el('button', { class: 'btn ghost small', text: 'EXPORT SAVE', onclick: () => this._export() }),

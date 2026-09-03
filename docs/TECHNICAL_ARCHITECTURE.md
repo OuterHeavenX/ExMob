@@ -21,7 +21,7 @@ src/rendering/              Renderer, CameraManager, LightingManager, QualityMan
 src/scenes/                 BootScene, MenuScene, CabinScene
 src/world/                  CabinBuilder (geometry), AssetLoader (GLB + fallbacks), Colliders
 src/player/                 Player, PlayerController, PlayerMovement, PlayerCombat, PlayerHealth
-src/combat/                 WeaponSystem, ProjectileSystem, DamageSystem, HitSystem, ReloadSystem
+src/combat/                 WeaponSystem, ProjectileSystem, DamageSystem, HitSystem, ReloadSystem, MeleeSystem, AimAssist
 src/enemies/                Enemy, EnemyController (FSM), EnemyNavigation, EnemyCombat, behaviors/*
 src/ai/                     NavGrid, AStar, CoverNodes, LineOfSight
 src/waves/                  WaveDirector, SpawnDirector
@@ -31,7 +31,7 @@ src/progression/            BountyManager, CampaignManager
 src/entities/               Vehicle, CashPickup, CharacterRig (skeletal clips, rigid-part fallback)
 src/cinematics/             CinematicDirector + sequences (Intro, VehicleArrival, Compromised)
 src/audio/                  AudioManager (buses), SynthSFX, MusicDirector
-src/vfx/                    VFXManager, ParticlePool, MuzzleFlash, Tracers, Decals, Debris
+src/vfx/                    VFXManager, ParticlePool, MuzzleFlash, Tracers, Decals, Debris, AimIndicator
 src/ui/                     TitleScreen, HUD, WaveBanner, ShopUI, PauseMenu, GameOverScreen, SettingsMenu, DebugOverlay, TouchControls
 src/input/                  InputManager, KeyboardMouseInput, TouchInput
 src/save/                   SaveManager, SaveSchema, migrations, IndexedDBStore

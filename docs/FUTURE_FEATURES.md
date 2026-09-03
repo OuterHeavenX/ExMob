@@ -43,7 +43,8 @@ rather than implementing early.
 - PWA install / offline.
 - Localization.
 - Achievements and statistics screen.
-- Accessibility: aim assist on touch, color-blind palettes, remappable keys.
+- Accessibility: color-blind palettes, remappable keys, aim assist presets for gamepad.
+  (Touch aim assist shipped in v0.4.0; see docs/MOBILE_REQUIREMENTS.md.)
 
 ## Deliberately rejected (for now)
 - Online multiplayer.

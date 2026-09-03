@@ -7,6 +7,7 @@ import { NavGrid } from '../ai/NavGrid.js';
 import { CoverNodes } from '../ai/CoverNodes.js';
 import { LineOfSight } from '../ai/LineOfSight.js';
 import { VFXManager } from '../vfx/VFXManager.js';
+import { AimIndicator } from '../vfx/AimIndicator.js';
 import { Player } from '../player/Player.js';
 import { EnemyManager } from '../enemies/EnemyManager.js';
 import { ProjectileSystem } from '../combat/ProjectileSystem.js';
@@ -55,6 +56,7 @@ export class CabinScene {
       stats: { kills: 0, shotsFired: 0, shotsHit: 0, meleeHits: 0, meleeKills: 0, cashEarned: 0, cashSpent: 0, deaths: 0, wavesSurvived: 0, playTime: 0 },
     };
     world.vfx = new VFXManager(scene, ctx.quality, lighting);
+    world.aimIndicator = new AimIndicator(scene);
     world.property = new PropertyManager(CABIN, builder, ctx, world);
     world.cover = new CoverNodes(builder.colliders);
     for (const n of CABIN.coverNodes) world.cover.addNode(n.x, n.z, 'data');
@@ -169,6 +171,10 @@ export class CabinScene {
 
     w.player.update(dt);
     w.enemies.update(dt);
+    const aimLine = ctx.settings.aimLine || 'auto';
+    const showAim = aimLine !== 'off' && (aimLine === 'on' || ctx.input.mode === 'touch')
+      && !w.player.health.dead && !w.cinematicActive && !w.paused;
+    w.aimIndicator.update(dt, w.player, w.player.controller.aim, w.player.controller.aimTarget, w, showAim);
     w.spawner.update(dt);
     w.playerCar.update(dt);
     w.waves.update(dt);

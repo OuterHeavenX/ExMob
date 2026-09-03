@@ -1,6 +1,6 @@
 # EXMOB - STATUS
 
-Honest state of every system as of **v0.3.0** (2026-09-03). Rule 17 of AGENTS.md: nothing here is
+Honest state of every system as of **v0.4.0** (2026-09-03). Rule 17 of AGENTS.md: nothing here is
 marked working unless it was exercised. "Tested" means exercised in the dev browser (Chromium,
 Windows 11, RTX 5080) unless stated otherwise.
 
@@ -20,6 +20,10 @@ Windows 11, RTX 5080) unless stated otherwise.
 - **Player**: WASD movement with collision, mouse aim, precision aim, dodge roll with i-frames,
   health + armor, four weapons with reload (magazine and shell), hitscan with spread, recoil,
   tracers, muzzle flash.
+- **Touch aiming**: aim line on the ground (trimmed at walls) with a target ring, aim assist
+  inside a 26 degree cone, auto-facing the nearest threat when the aim stick is idle, and a 35%
+  fire threshold. Measured in-browser on a sloppy 20 degree swipe at 6 m: 0/10 hits with assist
+  off, 10/10 with it on. Desktop verified unchanged (no assist, no aim line).
 - **Melee** (F/V, or the MELEE touch button): weapon-butt strike in an arc at close range, with
   a Blender swing clip, knockback, stagger, prop smashing and a HUD prompt when a target is in
   reach. Verified by stepping the simulation frame by frame in the browser: a pistol whip deals
@@ -48,8 +52,9 @@ Windows 11, RTX 5080) unless stated otherwise.
 - **Debug**: F3 overlay with FPS, frame/sim/render ms, draw calls, triangles, enemy states,
   particle/decal/debris counts; cheats (god, cash, start/skip wave, kill all, heal, spawn by
   archetype); AI path and nav grid visualization.
-- **Tests**: 52 Vitest unit tests pass (`npm test`), including melee arc geometry, target
-  selection, melee balance intent, and the save v1 -> v2 migration. Registry validation passes.
+- **Tests**: 68 Vitest unit tests pass (`npm test`), including melee arc geometry, target
+  selection, melee balance intent, aim assist cone/snap/pull behaviour, and the save v1 -> v2
+  migration. Registry validation passes.
 - **Blender pipeline**: headless generator scripts export 47 GLB prototypes with a manifest;
   the runtime loads them (skinned characters with clips, weapons in hand, props, sedan).
 - **Skeletal animation**: all five characters are skinned to a shared skeleton with Idle/Aim/
@@ -76,8 +81,9 @@ Windows 11, RTX 5080) unless stated otherwise.
 - **Vehicles**: drive, park, headlights, cover; no drive-bys, no player driving.
 - **Performance scaling**: presets work; automatic step-down under load is not enabled.
 - **Mobile**: touch controls implemented (floating dual sticks, buttons, safe areas, rotate
-  prompt) and exercised with pointer events in a mobile-sized viewport in the desktop browser.
-  Not tested on a physical phone or tablet.
+  prompt, aim line, aim assist) and exercised with synthetic pointer events in a 844x390 landscape
+  viewport in the desktop browser. Still not tested on a physical phone or tablet: thumb comfort,
+  real multi-touch, and frame rate on phone hardware remain unverified.
 
 ## PLACEHOLDER
 
@@ -114,6 +120,10 @@ Windows 11, RTX 5080) unless stated otherwise.
   A normal Chromium window measured 240 fps at HIGH (uncapped) on the RTX 5080 dev machine.
 - Enemies now back off inside their preferred range, but still bunch up in doorways when
   several arrive together.
+- Aim assist helps only inside its cone: a swipe more than 26 degrees off target is still a
+  miss, by design. LIGHT (14 degree cone) does nothing for large errors.
+- The aim line is drawn on the ground plane, so it reads oddly across the porch step where the
+  floor height changes.
 - Melee has no dedicated per-weapon clips: every weapon plays the same `ANM_Melee` swing, so the
   shotgun buttstroke looks like the pistol whip.
 - Enemies have no melee of their own; an Enforcer who reaches the player still shoots.

@@ -14,11 +14,12 @@ import { SFX, AUDIO_BUSES, MUSIC_STATES } from './audio/audioRegistry.js';
 import { VFX, SURFACE_VFX } from './vfx/vfxRegistry.js';
 import { CHARACTERS } from './characters/characterRegistry.js';
 import { QUALITY_PRESETS, QUALITY_ORDER } from './quality.js';
+import { AIM_ASSIST, AIM_ASSIST_DEFAULTS, TOUCH_AIM } from './aim.js';
 
 export {
   WEAPONS, WEAPON_SLOTS, ENEMIES, CABIN_ENEMY_IDS, CABIN_WAVES, CABIN, SHOP_ITEMS, WORLD_PURCHASES,
   DEFENSES, ECONOMY, DIFFICULTY, SFX, AUDIO_BUSES, MUSIC_STATES, VFX, SURFACE_VFX, CHARACTERS,
-  QUALITY_PRESETS, QUALITY_ORDER,
+  QUALITY_PRESETS, QUALITY_ORDER, AIM_ASSIST, TOUCH_AIM,
 };
 
 export const PROPERTIES = Object.freeze({ cabin: CABIN });
@@ -126,6 +127,16 @@ export function validateRegistries() {
   if (ECONOMY.bountyStages[0] !== ECONOMY.bountyStart) push('economy: bountyStart must equal first stage');
   for (const w of CABIN_WAVES) if (!ECONOMY.bountyStages.includes(w.bountyAfter)) push(`wave ${w.id}: bountyAfter not a bounty stage`);
   if (!CHARACTERS.exmob) push('characters: exmob missing');
+
+  // aim assist
+  for (const [key, a] of Object.entries(AIM_ASSIST)) {
+    if (a.id !== key) push(`aim assist ${key}: id mismatch`);
+    if (a.coneDeg < 0 || a.coneDeg > 90) push(`aim assist ${key}: coneDeg out of range`);
+    if (a.snapDeg > a.coneDeg) push(`aim assist ${key}: snapDeg must not exceed coneDeg`);
+    if (a.pull < 0 || a.pull > 1) push(`aim assist ${key}: pull out of range`);
+  }
+  for (const mode of Object.values(AIM_ASSIST_DEFAULTS)) if (!AIM_ASSIST[mode]) push(`aim assist default ${mode} missing`);
+  if (!(TOUCH_AIM.fireThreshold > TOUCH_AIM.aimDeadZone)) push('touch aim: fireThreshold must exceed aimDeadZone');
 
   return errors;
 }

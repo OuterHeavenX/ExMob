@@ -68,10 +68,21 @@ npm run blender:build
 
 ### Mobile / touch
 
-Left thumb: virtual move stick. Right thumb: virtual aim stick (pushing it past the
-dead zone fires automatically). On-screen buttons: MELEE, INTERACT, RELOAD, WEAPON, DODGE,
-SHOP/READY, PAUSE. The MELEE button lights up when someone is inside your reach. Touch
-controls are built as a first-class input path, not an overlay.
+Left thumb: virtual move stick. Right thumb: virtual aim stick. On-screen buttons: MELEE,
+INTERACT, RELOAD, WEAPON, DODGE, SHOP/READY, PAUSE. The MELEE button lights up when someone is
+inside your reach. Touch controls are built as a first-class input path, not an overlay.
+
+Because a thumb has no cursor, touch play gets three things a mouse does not need:
+
+- **An aim line.** A line on the ground shows exactly where you are pointing, stopping at the
+  wall in front of you, with a ring around whoever you have acquired.
+- **Aim assist.** Point roughly at someone and the aim closes the last few degrees. Beyond a
+  26 degree cone nothing is corrected, so you still choose the target.
+- **Auto-facing.** With no thumb on the aim stick, Ray tracks the nearest threat, so moving and
+  meleeing with one thumb works.
+
+All three are in SETTINGS (AIM ASSIST, AIM LINE, TOUCH FIRING) and default to on for touch and
+off for a mouse.
 
 Dev mode: add `?dev=1` to the URL to enable the DEBUG menu button and the debug overlay.
 Smoke test harness: `?dev=1&smoke=1` runs the automated smoke sequence and prints results.

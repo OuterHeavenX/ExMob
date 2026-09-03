@@ -16,6 +16,8 @@ export class InputManager {
     this.aimVector = null;
     this.fire = false;
     this.precision = false;
+    /** Set by PlayerController each frame: does aim assist currently hold a target? */
+    this.aimHasTarget = false;
     this._held = new Set();
     this._pressed = new Set();
     this.mode = forceTouch || (device && device.isMobile) ? 'touch' : 'desktop';

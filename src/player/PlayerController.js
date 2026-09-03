@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { EV } from '../core/Events.js';
+import { AimAssist } from '../combat/AimAssist.js';
+import { resolveAssist } from '../data/aim.js';
 
 /**
  * Turns InputManager state into player actions: move, aim (screen unproject or stick vector),
@@ -11,6 +13,8 @@ export class PlayerController {
     this.aim = { x: 0, z: 1 };
     this.aimPoint = new THREE.Vector3();
     this._ground = new THREE.Vector3();
+    this.assist = new AimAssist(player.world);
+    this.aimTarget = null;
     this.interaction = null;
     this.holdT = 0;
     this.holdNeeded = 0;
@@ -25,23 +29,36 @@ export class PlayerController {
       mx = input.move.x; mz = input.move.y;
       fire = input.fire;
       precision = input.precision;
-      // aim
+      // ---- aim: raw input first, then assist (docs/MOBILE_REQUIREMENTS.md, Aiming)
+      let rawX = this.aim.x, rawZ = this.aim.z, hasAimInput = false;
       if (input.aimVector) {
         const len = Math.hypot(input.aimVector.x, input.aimVector.y) || 1;
-        this.aim.x = input.aimVector.x / len; this.aim.z = input.aimVector.y / len;
+        rawX = input.aimVector.x / len; rawZ = input.aimVector.y / len;
+        hasAimInput = true;
       } else if (input.aimScreen) {
         const g = w.ctx.camera.screenToGround(input.aimScreen.x, input.aimScreen.y, w.ctx.renderer.width, w.ctx.renderer.height, p.y + 1.0, this._ground);
         if (g) {
           const dx = g.x - p.x, dz = g.z - p.z;
           const len = Math.hypot(dx, dz);
-          if (len > 0.15) { this.aim.x = dx / len; this.aim.z = dz / len; }
+          if (len > 0.15) { rawX = dx / len; rawZ = dz / len; hasAimInput = true; }
           this.aimPoint.copy(g);
         }
-      } else if (Math.hypot(mx, mz) > 0.1 && input.mode === 'touch') {
-        // touch: no aim stick -> face movement direction
-        const len = Math.hypot(mx, mz);
-        this.aim.x = mx / len; this.aim.z = mz / len;
       }
+      const preset = resolveAssist(w.ctx.settings.aimAssist, input.mode);
+      if (hasAimInput) {
+        const r = this.assist.apply(p.x, p.z, rawX, rawZ, preset);
+        this.aim.x = r.x; this.aim.z = r.z;
+      } else if (input.mode === 'touch') {
+        // no thumb on the aim stick: track the nearest threat, else face where we are walking
+        const face = this.assist.autoFace(p.x, p.z, preset);
+        if (face) { this.aim.x = face.x; this.aim.z = face.z; }
+        else if (Math.hypot(mx, mz) > 0.1) {
+          const len = Math.hypot(mx, mz);
+          this.aim.x = mx / len; this.aim.z = mz / len;
+        }
+      }
+      this.aimTarget = this.assist.target;
+      input.aimHasTarget = !!this.aimTarget;
       if (input.pressed('melee')) p.combat.tryMelee();
       if (input.pressed('dodge')) p.movement.tryDodge(mx, mz);
       if (input.pressed('reload')) p.combat.startReload();

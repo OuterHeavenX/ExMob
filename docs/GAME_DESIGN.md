@@ -73,7 +73,9 @@ See README.md for the full mapping. Design intent:
   in a wide arc, not a separate melee weapon: whatever is in Ray's hands is what hits them.
 - Interaction (E) is context sensitive: open/close doors, repair, board windows, pick up.
 - Mobile uses dual virtual sticks with fire-on-aim, plus context buttons. It is a first-class
-  path designed alongside desktop, not an afterthought.
+  path designed alongside desktop, not an afterthought. Because a thumb has no cursor, touch play
+  adds a visible aim line, aim assist inside a cone, and auto-facing when the aim stick is idle
+  (docs/MOBILE_REQUIREMENTS.md, Aiming). None of it is on for mouse play, which needs no help.
 
 ## Combat philosophy
 
